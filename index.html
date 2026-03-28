@@ -35,37 +35,28 @@
 
     /* ─── HEADER ─── */
     header {
-      background:
-        radial-gradient(ellipse at 50% 0%, #1c1030 0%, transparent 70%),
-        linear-gradient(180deg, #0a0608 0%, #120c10 60%, #0c0a08 100%);
-      border-bottom: 1px solid #3a2a1a;
+      background: linear-gradient(180deg, #010302 0%, #030805 50%, #050a06 100%);
+      border-bottom: 1px solid #162416;
       color: var(--text);
       padding: 3.5rem 2rem 3rem;
       text-align: center;
       position: relative;
+      overflow: hidden;
     }
-    header::before {
-      content: '';
+    /* ─── FOREST BACKGROUND SVG ─── */
+    .forest-bg {
       position: absolute;
       inset: 0;
-      background-image:
-        radial-gradient(circle at 20% 50%, rgba(160,120,40,.04) 0%, transparent 50%),
-        radial-gradient(circle at 80% 50%, rgba(100,60,80,.05) 0%, transparent 50%);
+      width: 100%;
+      height: 100%;
       pointer-events: none;
+      z-index: 0;
     }
-    /* ─── HEADER FAIRIES ─── */
-    .header-fairy {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 115px;
-      width: auto;
-      opacity: 0.72;
-      pointer-events: none;
+    /* ─── HEADER TEXT LAYER ─── */
+    .header-text {
+      position: relative;
+      z-index: 2;
     }
-    .fairy-left  { left: 1.75rem; }
-    .fairy-right { right: 1.75rem; transform: translateY(-50%) scaleX(-1); }
-    @media (max-width: 780px) { .header-fairy { display: none; } }
 
     .header-ornament {
       font-family: 'Cinzel', serif;
@@ -613,90 +604,147 @@
 
 <header>
 
-  <!-- Mushroom left -->
-  <svg class="header-fairy fairy-left" viewBox="0 0 70 116" xmlns="http://www.w3.org/2000/svg"
-       fill="none" stroke="#c9a040" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-    <!-- small companion mushroom (outer side) -->
-    <path d="M 2,88 C 0,81 3,73 10,71 C 17,73 20,81 18,88"/>
-    <path d="M 2,88 C 4,92 10,94 18,88"/>
-    <path d="M 7,93 C 7,100 7,106 8,109"/>
-    <path d="M 13,93 C 13,100 13,106 12,109"/>
-    <path d="M 8,109 Q 10,111 12,109"/>
-    <circle cx="10" cy="79" r="2.2"/>
-    <!-- main cap outer edge -->
-    <path d="M 8,52 C 2,34 6,13 35,8 C 64,13 68,34 62,52"/>
-    <!-- cap underside lip -->
-    <path d="M 8,52 C 12,60 22,63 35,62 C 48,63 58,60 62,52"/>
-    <!-- gills -->
-    <path d="M 35,62 C 27,58 17,56 10,54" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 31,58 23,55 15,53" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 39,58 47,55 55,53" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 43,58 53,56 60,54" stroke-width="0.85" opacity="0.65"/>
-    <!-- stem -->
-    <path d="M 27,63 C 25,76 24,91 26,104"/>
-    <path d="M 43,63 C 45,76 46,91 44,104"/>
-    <!-- base flare and ground line -->
-    <path d="M 26,104 C 22,108 20,111 22,113"/>
-    <path d="M 44,104 C 48,108 50,111 48,113"/>
-    <path d="M 22,113 C 29,116 41,116 48,113"/>
-    <!-- spots (open circles) -->
-    <circle cx="26" cy="26" r="5.5"/>
-    <circle cx="47" cy="22" r="4.5"/>
-    <circle cx="35" cy="40" r="3.5"/>
-    <circle cx="16" cy="42" r="2.5"/>
-    <circle cx="54" cy="40" r="2.5"/>
-    <!-- floating sparkle dots -->
-    <circle cx="4"  cy="44" r="1"   fill="#c9a040" stroke="none"/>
-    <circle cx="65" cy="30" r="1"   fill="#c9a040" stroke="none"/>
-    <circle cx="67" cy="48" r="0.8" fill="#c9a040" stroke="none"/>
+  <!-- Dark forest panorama -->
+  <svg class="forest-bg" viewBox="0 0 1200 220" preserveAspectRatio="xMidYMax slice"
+       xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#010302"/>
+        <stop offset="55%"  stop-color="#040c05"/>
+        <stop offset="100%" stop-color="#081510"/>
+      </linearGradient>
+      <radialGradient id="moon-glow" cx="50%" cy="50%" r="50%">
+        <stop offset="0%"   stop-color="#c8dfc0" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#c8dfc0" stop-opacity="0"/>
+      </radialGradient>
+      <linearGradient id="mist-grad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#081510" stop-opacity="0"/>
+        <stop offset="60%"  stop-color="#0a1a0c" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="#0c1e0e" stop-opacity="0.85"/>
+      </linearGradient>
+    </defs>
+
+    <!-- Sky -->
+    <rect width="1200" height="220" fill="url(#sky-grad)"/>
+
+    <!-- Moon glow halo -->
+    <circle cx="920" cy="55" r="70" fill="url(#moon-glow)"/>
+    <!-- Moon disc -->
+    <circle cx="920" cy="55" r="22" fill="#d4e8cc" opacity="0.82"/>
+    <!-- Moon shadow (crescent suggestion) -->
+    <circle cx="930" cy="50" r="19" fill="#040c05"/>
+
+    <!-- Stars -->
+    <circle cx="60"  cy="18" r="0.9" fill="#c8e8c0" opacity="0.7"/>
+    <circle cx="130" cy="9"  r="1.1" fill="#d4f0cc" opacity="0.75"/>
+    <circle cx="210" cy="24" r="0.8" fill="#c0e0b8" opacity="0.6"/>
+    <circle cx="290" cy="12" r="1.0" fill="#d0eccc" opacity="0.7"/>
+    <circle cx="375" cy="6"  r="0.9" fill="#cce8c4" opacity="0.65"/>
+    <circle cx="440" cy="20" r="0.7" fill="#c8e4c0" opacity="0.55"/>
+    <circle cx="510" cy="10" r="1.1" fill="#d4f0cc" opacity="0.75"/>
+    <circle cx="580" cy="28" r="0.8" fill="#c0e0b8" opacity="0.6"/>
+    <circle cx="645" cy="8"  r="1.0" fill="#d0eccc" opacity="0.7"/>
+    <circle cx="720" cy="18" r="0.9" fill="#c8e8c0" opacity="0.65"/>
+    <circle cx="800" cy="12" r="0.7" fill="#cce4bc" opacity="0.55"/>
+    <circle cx="860" cy="32" r="0.8" fill="#c0e0b8" opacity="0.6"/>
+    <circle cx="970" cy="22" r="0.9" fill="#c8e8c0" opacity="0.65"/>
+    <circle cx="1040" cy="10" r="1.1" fill="#d4f0cc" opacity="0.75"/>
+    <circle cx="1100" cy="28" r="0.8" fill="#c0e0b8" opacity="0.6"/>
+    <circle cx="1160" cy="14" r="1.0" fill="#d0eccc" opacity="0.7"/>
+    <circle cx="168" cy="38" r="0.7" fill="#c8e4c0" opacity="0.5"/>
+    <circle cx="480" cy="36" r="0.7" fill="#c8e4c0" opacity="0.5"/>
+    <circle cx="760" cy="42" r="0.6" fill="#c0ddb8" opacity="0.45"/>
+    <circle cx="1070" cy="40" r="0.7" fill="#c8e4c0" opacity="0.5"/>
+
+    <!-- Distant trees (faintest layer) -->
+    <g fill="#0d1c0d" opacity="0.9">
+      <polygon points="30,195 38,155 46,195"/>
+      <polygon points="55,195 65,148 75,195"/>
+      <polygon points="85,195 97,160 109,195"/>
+      <polygon points="120,195 130,152 140,195"/>
+      <polygon points="155,195 164,162 173,195"/>
+      <polygon points="185,195 196,145 207,195"/>
+      <polygon points="220,195 230,158 240,195"/>
+      <polygon points="255,195 265,150 275,195"/>
+      <polygon points="290,195 302,155 314,195"/>
+      <polygon points="325,195 335,160 345,195"/>
+      <polygon points="355,195 366,148 377,195"/>
+      <polygon points="388,195 398,155 408,195"/>
+      <polygon points="425,195 436,145 447,195"/>
+      <polygon points="460,195 471,158 482,195"/>
+      <polygon points="495,195 506,152 517,195"/>
+      <polygon points="530,195 541,162 552,195"/>
+      <polygon points="565,195 576,148 587,195"/>
+      <polygon points="600,195 611,155 622,195"/>
+      <polygon points="635,195 646,160 657,195"/>
+      <polygon points="670,195 681,150 692,195"/>
+      <polygon points="705,195 716,155 727,195"/>
+      <polygon points="740,195 751,148 762,195"/>
+      <polygon points="775,195 786,162 797,195"/>
+      <polygon points="815,195 826,152 837,195"/>
+      <polygon points="850,195 861,158 872,195"/>
+      <polygon points="890,195 901,145 912,195"/>
+      <polygon points="930,195 941,160 952,195"/>
+    </g>
+
+    <!-- Mid trees -->
+    <g fill="#070e07" opacity="0.95">
+      <polygon points="0,210 14,138 28,210"/>
+      <polygon points="22,210 38,128 54,210"/>
+      <polygon points="65,210 82,135 99,210"/>
+      <polygon points="110,210 128,130 146,210"/>
+      <polygon points="155,210 172,140 189,210"/>
+      <polygon points="200,210 218,128 236,210"/>
+      <polygon points="248,210 266,135 284,210"/>
+      <polygon points="300,210 318,132 336,210"/>
+      <polygon points="352,210 370,138 388,210"/>
+      <polygon points="405,210 423,130 441,210"/>
+      <polygon points="460,210 478,135 496,210"/>
+      <polygon points="515,210 533,128 551,210"/>
+      <polygon points="568,210 586,140 604,210"/>
+      <polygon points="625,210 643,130 661,210"/>
+      <polygon points="682,210 700,135 718,210"/>
+      <polygon points="738,210 756,128 774,210"/>
+      <polygon points="795,210 813,138 831,210"/>
+      <polygon points="855,210 873,132 891,210"/>
+      <polygon points="915,210 933,130 951,210"/>
+      <polygon points="970,210 988,135 1006,210"/>
+    </g>
+
+    <!-- Foreground trees — left cluster -->
+    <g fill="#030605">
+      <polygon points="-10,220 12,80 34,220"/>
+      <polygon points="18,220 44,68 70,220"/>
+      <polygon points="55,220 84,75 113,220"/>
+      <polygon points="100,220 132,85 164,220"/>
+      <polygon points="148,220 178,90 208,220"/>
+      <polygon points="195,220 222,98 249,220"/>
+    </g>
+
+    <!-- Foreground trees — right cluster -->
+    <g fill="#030605">
+      <polygon points="951,220 978,98 1005,220"/>
+      <polygon points="992,220 1022,90 1052,220"/>
+      <polygon points="1038,220 1070,75 1102,220"/>
+      <polygon points="1086,220 1118,68 1150,220"/>
+      <polygon points="1130,220 1158,80 1186,220"/>
+      <polygon points="1172,220 1198,88 1224,220"/>
+    </g>
+
+    <!-- Ground mist -->
+    <rect x="0" y="158" width="1200" height="62" fill="url(#mist-grad)"/>
   </svg>
 
-  <!-- Mushroom right (mirrored — companion appears on outer side) -->
-  <svg class="header-fairy fairy-right" viewBox="0 0 70 116" xmlns="http://www.w3.org/2000/svg"
-       fill="none" stroke="#c9a040" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-    <!-- small companion mushroom (outer side) -->
-    <path d="M 2,88 C 0,81 3,73 10,71 C 17,73 20,81 18,88"/>
-    <path d="M 2,88 C 4,92 10,94 18,88"/>
-    <path d="M 7,93 C 7,100 7,106 8,109"/>
-    <path d="M 13,93 C 13,100 13,106 12,109"/>
-    <path d="M 8,109 Q 10,111 12,109"/>
-    <circle cx="10" cy="79" r="2.2"/>
-    <!-- main cap outer edge -->
-    <path d="M 8,52 C 2,34 6,13 35,8 C 64,13 68,34 62,52"/>
-    <!-- cap underside lip -->
-    <path d="M 8,52 C 12,60 22,63 35,62 C 48,63 58,60 62,52"/>
-    <!-- gills -->
-    <path d="M 35,62 C 27,58 17,56 10,54" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 31,58 23,55 15,53" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 39,58 47,55 55,53" stroke-width="0.85" opacity="0.65"/>
-    <path d="M 35,62 C 43,58 53,56 60,54" stroke-width="0.85" opacity="0.65"/>
-    <!-- stem -->
-    <path d="M 27,63 C 25,76 24,91 26,104"/>
-    <path d="M 43,63 C 45,76 46,91 44,104"/>
-    <!-- base flare and ground line -->
-    <path d="M 26,104 C 22,108 20,111 22,113"/>
-    <path d="M 44,104 C 48,108 50,111 48,113"/>
-    <path d="M 22,113 C 29,116 41,116 48,113"/>
-    <!-- spots (open circles) -->
-    <circle cx="26" cy="26" r="5.5"/>
-    <circle cx="47" cy="22" r="4.5"/>
-    <circle cx="35" cy="40" r="3.5"/>
-    <circle cx="16" cy="42" r="2.5"/>
-    <circle cx="54" cy="40" r="2.5"/>
-    <!-- floating sparkle dots -->
-    <circle cx="4"  cy="44" r="1"   fill="#c9a040" stroke="none"/>
-    <circle cx="65" cy="30" r="1"   fill="#c9a040" stroke="none"/>
-    <circle cx="67" cy="48" r="0.8" fill="#c9a040" stroke="none"/>
-  </svg>
-
-  <div class="header-ornament">✦ &nbsp; Textual Analysis &nbsp; ✦</div>
-  <h1>Fairy Tale Corpus Explorer</h1>
-  <div class="header-rule"><span class="header-rule-gem">❧</span></div>
-  <p>A comparative analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures and authors.</p>
-  <div class="corpus-badges">
-    <span class="badge badge-hca">Hans Christian Andersen</span>
-    <span class="badge badge-grimms">Grimm's Fairy Tales</span>
-    <span class="badge badge-russian">Russian Fairy Tales</span>
+  <div class="header-text">
+    <div class="header-ornament">✦ &nbsp; Textual Analysis &nbsp; ✦</div>
+    <h1>Fairy Tale Corpus Explorer</h1>
+    <div class="header-rule"><span class="header-rule-gem">❧</span></div>
+    <p>A comparative analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures and authors.</p>
+    <div class="corpus-badges">
+      <span class="badge badge-hca">Hans Christian Andersen</span>
+      <span class="badge badge-grimms">Grimm's Fairy Tales</span>
+      <span class="badge badge-russian">Russian Fairy Tales</span>
+    </div>
   </div>
 </header>
 
