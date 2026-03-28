@@ -46,7 +46,7 @@
     header p {
       opacity: .75;
       font-size: .95rem;
-      max-width: 600px;
+      max-width: 640px;
       margin: 0 auto;
       line-height: 1.6;
     }
@@ -117,6 +117,7 @@
       font-size: .9rem;
       margin-bottom: 1.75rem;
       line-height: 1.6;
+      max-width: 760px;
     }
 
     /* ─── CARDS ─── */
@@ -132,6 +133,12 @@
       font-size: .95rem;
       margin-bottom: 1rem;
       color: var(--text);
+    }
+    .card-subtitle {
+      font-size: .8rem;
+      color: var(--muted);
+      margin-top: -.5rem;
+      margin-bottom: 1rem;
     }
 
     /* ─── STATS ROW ─── */
@@ -169,41 +176,8 @@
       gap: 1.5rem;
     }
 
-    /* ─── COMPARISON TABLE ─── */
-    .comparison-table-wrap {
-      overflow-x: auto;
-    }
-    table.comparison {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: .85rem;
-    }
-    table.comparison th {
-      background: #f4f1eb;
-      padding: .6rem .9rem;
-      text-align: left;
-      font-weight: 600;
-      position: sticky;
-      top: 0;
-    }
-    table.comparison td {
-      padding: .5rem .9rem;
-      border-bottom: 1px solid #f0ede5;
-    }
-    table.comparison tr:hover td { background: #faf9f6; }
-    .bar-cell { display: flex; align-items: center; gap: .5rem; }
-    .mini-bar {
-      height: 10px;
-      border-radius: 5px;
-      min-width: 2px;
-    }
-    .bar-hca     { background: var(--hca); }
-    .bar-grimms  { background: var(--grimms); }
-    .bar-russian { background: var(--russian); }
-
-    /* ─── DIVERGENCE ─── */
-    #divergence-chart-wrap svg { overflow: visible; }
-    .divergence-filter { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    /* ─── FILTER BUTTONS ─── */
+    .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center; }
     .filter-btn {
       padding: .35rem .85rem;
       border-radius: 20px;
@@ -212,21 +186,138 @@
       font-weight: 600;
       cursor: pointer;
       transition: all .2s;
+      font-family: inherit;
+      background: transparent;
     }
     .filter-btn.active { color: #fff; }
-    .filter-btn.hca     { border-color: var(--hca);     background: transparent; color: var(--hca); }
-    .filter-btn.grimms  { border-color: var(--grimms);  background: transparent; color: var(--grimms); }
-    .filter-btn.russian { border-color: var(--russian); background: transparent; color: var(--russian); }
+    .filter-btn.hca     { border-color: var(--hca);     color: var(--hca); }
+    .filter-btn.grimms  { border-color: var(--grimms);  color: var(--grimms); }
+    .filter-btn.russian { border-color: var(--russian); color: var(--russian); }
     .filter-btn.hca.active     { background: var(--hca); }
     .filter-btn.grimms.active  { background: var(--grimms); }
     .filter-btn.russian.active { background: var(--russian); }
+    .filter-btn.neutral { border-color: #888; color: #555; }
+    .filter-btn.neutral.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+
+    /* ─── COMPARISON TABLE ─── */
+    .table-controls {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      margin-bottom: .75rem;
+      flex-wrap: wrap;
+    }
+    .table-controls select,
+    .table-controls input[type=text] {
+      padding: .35rem .65rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .82rem;
+      font-family: inherit;
+      background: var(--surface);
+    }
+    .table-controls input[type=text] { flex: 1; min-width: 130px; }
+    .table-wrap { overflow-x: auto; max-height: 520px; overflow-y: auto; }
+    table.comparison {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+    table.comparison th {
+      background: #f4f1eb;
+      padding: .6rem .9rem;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    table.comparison td { padding: .5rem .9rem; border-bottom: 1px solid #f0ede5; }
+    table.comparison tr:hover td { background: #faf9f6; }
+    .bar-cell { display: flex; align-items: center; gap: .4rem; }
+    .mini-bar { height: 10px; border-radius: 5px; min-width: 2px; }
+    .bar-hca     { background: var(--hca); }
+    .bar-grimms  { background: var(--grimms); }
+    .bar-russian { background: var(--russian); }
+
+    /* ─── RATIO BADGES ─── */
+    .ratio-badge {
+      display: inline-block;
+      font-size: .68rem;
+      font-weight: 700;
+      padding: .1rem .45rem;
+      border-radius: 10px;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .ratio-hca     { background: var(--hca); }
+    .ratio-grimms  { background: var(--grimms); }
+    .ratio-russian { background: var(--russian); }
+    .ratio-equal   { background: #888; }
+
+    /* ─── THEMES ─── */
+    .theme-selector {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: .65rem;
+      margin-bottom: 1.5rem;
+    }
+    .theme-btn {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: .65rem 1rem;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: .83rem;
+      font-weight: 500;
+      text-align: left;
+      transition: all .18s;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .theme-btn:hover { border-color: #999; background: #f7f5ef; }
+    .theme-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: #fff; }
+    .theme-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .theme-breakdown {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: .5rem;
+    }
+    .theme-word-row {
+      background: #f8f6f0;
+      border-radius: 6px;
+      padding: .5rem .75rem;
+      font-size: .82rem;
+    }
+    .theme-word-label { font-weight: 600; margin-bottom: .35rem; color: var(--text); }
+    .theme-word-bars { display: flex; flex-direction: column; gap: .25rem; }
+    .theme-word-bar-row { display: flex; align-items: center; gap: .4rem; font-size: .74rem; color: var(--muted); }
+    .theme-word-bar-fill { height: 7px; border-radius: 4px; min-width: 2px; }
+
+    /* ─── DIVERGENCE ─── */
+    #scatter-svg text { font-family: 'Inter', sans-serif; }
+    .bubble-tip {
+      position: absolute;
+      background: rgba(20,20,40,.9);
+      color: #fff;
+      padding: .4rem .75rem;
+      border-radius: 6px;
+      font-size: .78rem;
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity .15s;
+      z-index: 10;
+    }
 
     /* ─── CONCORDANCE ─── */
     .conc-controls {
       display: flex;
       gap: .75rem;
       flex-wrap: wrap;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
       align-items: flex-end;
     }
     .conc-controls label {
@@ -244,13 +335,9 @@
       border-radius: var(--radius);
       font-size: .9rem;
       font-family: inherit;
-      background: var(--surface);
     }
-    .conc-input-wrap input:focus {
-      outline: none;
-      border-color: #1a1a2e;
-    }
-    .btn-search {
+    .conc-input-wrap input:focus { outline: none; border-color: #1a1a2e; }
+    .btn-primary {
       padding: .6rem 1.4rem;
       background: #1a1a2e;
       color: #fff;
@@ -262,8 +349,7 @@
       font-family: inherit;
       white-space: nowrap;
     }
-    .btn-search:hover { background: #0f3460; }
-
+    .btn-primary:hover { background: #0f3460; }
     .suggestions { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .suggestion-btn {
       padding: .25rem .65rem;
@@ -274,12 +360,12 @@
       cursor: pointer;
       font-family: inherit;
       transition: all .15s;
+      color: var(--text);
     }
     .suggestion-btn:hover { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
-
     .conc-results-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
       gap: 1.25rem;
     }
     .conc-corpus-panel {
@@ -304,42 +390,48 @@
       padding: .65rem 1rem;
       border-bottom: 1px solid #f0ede5;
       font-size: .83rem;
-      line-height: 1.55;
+      line-height: 1.6;
+      color: var(--text);
     }
     .conc-entry:last-child { border-bottom: none; }
-    .conc-entry mark {
-      background: #fff3cd;
-      border-radius: 2px;
-      padding: 0 2px;
-      font-weight: 600;
+    .conc-entry mark { background: #fff3cd; border-radius: 2px; padding: 0 2px; font-weight: 600; }
+    .conc-empty { padding: 1rem; color: var(--muted); font-size: .85rem; font-style: italic; }
+    .conc-loading { padding: 1rem; color: var(--muted); font-size: .85rem; }
+    .conc-count-badge {
+      display: inline-block;
+      background: rgba(255,255,255,.3);
+      border-radius: 10px;
+      padding: .05rem .5rem;
+      font-size: .75rem;
     }
-    .conc-empty {
-      padding: 1rem;
-      color: var(--muted);
+
+    /* ─── WORD CLOUD ─── */
+    #word-cloud-svg text { cursor: default; transition: opacity .2s; }
+    #word-cloud-svg text:hover { opacity: .7; }
+
+    /* ─── CALLOUT BOX ─── */
+    .callout {
+      background: #f0f4fa;
+      border-left: 4px solid var(--hca);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: .9rem 1.2rem;
       font-size: .85rem;
-      font-style: italic;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
     }
+    .callout strong { color: #1a1a2e; }
 
-    /* ─── BUBBLE CHART ─── */
-    .bubble-tip {
-      position: absolute;
-      background: rgba(0,0,0,.85);
-      color: #fff;
-      padding: .4rem .75rem;
-      border-radius: 6px;
-      font-size: .78rem;
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity .15s;
+    /* ─── INSIGHT CHIPS ─── */
+    .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem; margin-bottom: 1.5rem; }
+    .insight-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .9rem 1.1rem;
+      font-size: .82rem;
+      line-height: 1.55;
     }
-
-    /* ─── RESPONSIVE ─── */
-    @media (max-width: 600px) {
-      header { padding: 2rem 1rem 1.5rem; }
-      main { padding: 1.25rem 1rem; }
-      .tab-btn { padding: .75rem 1rem; font-size: .8rem; }
-    }
+    .insight-chip strong { display: block; font-size: .88rem; margin-bottom: .25rem; }
 
     /* ─── LOADING ─── */
     #loading {
@@ -366,9 +458,13 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ─── WORD CLOUD ─── */
-    #word-cloud-svg text { cursor: default; transition: opacity .2s; }
-    #word-cloud-svg text:hover { opacity: .7; }
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      header { padding: 2rem 1rem 1.5rem; }
+      main { padding: 1.25rem 1rem; }
+      .tab-btn { padding: .75rem 1rem; font-size: .8rem; }
+      .theme-selector { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+    }
   </style>
 </head>
 <body>
@@ -380,7 +476,7 @@
 
 <header>
   <h1>Fairy Tale Corpus Explorer</h1>
-  <p>A comparative text analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures.</p>
+  <p>A comparative text analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures and authors.</p>
   <div class="corpus-badges">
     <span class="badge badge-hca">Hans Christian Andersen</span>
     <span class="badge badge-grimms">Grimm's Fairy Tales</span>
@@ -392,168 +488,214 @@
   <button class="tab-btn active" data-tab="overview">Overview</button>
   <button class="tab-btn" data-tab="frequencies">Word Frequencies</button>
   <button class="tab-btn" data-tab="comparison">Cross-Corpus Comparison</button>
+  <button class="tab-btn" data-tab="themes">Themes &amp; Motifs</button>
   <button class="tab-btn" data-tab="divergence">Distinctive Words</button>
   <button class="tab-btn" data-tab="concordance">Concordance</button>
 </nav>
 
 <main>
 
-  <!-- ═══════════════════════════════════════ OVERVIEW ══ -->
-  <section class="section active" id="tab-overview">
-    <h2 class="section-title">Corpus Overview</h2>
-    <p class="section-desc">
-      Summary statistics for each collection after removing stopwords and common function words.
-      HCA is the largest collection by a wide margin; use the per-10,000 token metrics for fair comparisons.
+<!-- ═══════════════════════════════════════ OVERVIEW ══ -->
+<section class="section active" id="tab-overview">
+  <h2 class="section-title">Corpus Overview</h2>
+  <p class="section-desc">
+    Summary statistics for each collection after stripping Gutenberg headers, removing stopwords,
+    and filtering to content words. HCA is roughly 3× larger than the other two; all frequency
+    comparisons use per-10,000 token normalization.
+  </p>
+
+  <div class="stats-grid" id="stats-grid"></div>
+
+  <div class="insight-grid" id="overview-insights"></div>
+
+  <div class="card">
+    <div class="card-title">Vocabulary Size Comparison</div>
+    <div class="card-subtitle">Solid bars = total content-word tokens; outlined = unique vocabulary</div>
+    <div class="chart-wrap" style="max-height:300px">
+      <canvas id="overview-bar-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Top 30 Shared Terms — Normalized Frequency (per 10,000 tokens)</div>
+    <div class="card-subtitle">Words that appear in all three collections; bars allow direct cross-corpus comparison</div>
+    <div class="chart-wrap" style="max-height:440px">
+      <canvas id="shared-bar-chart"></canvas>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ FREQUENCIES ══ -->
+<section class="section" id="tab-frequencies">
+  <h2 class="section-title">Word Frequency Distributions</h2>
+  <p class="section-desc">
+    Top 30 most frequent content words per collection. Toggle between raw counts and normalized
+    frequency (per 10,000 tokens) to account for the size difference between corpora.
+  </p>
+  <div class="filter-row">
+    <button class="filter-btn neutral active" id="freq-mode-raw" onclick="setFreqMode('raw')">Raw Counts</button>
+    <button class="filter-btn neutral" id="freq-mode-norm" onclick="setFreqMode('norm')">Per 10k Tokens</button>
+  </div>
+  <div class="charts-grid" id="freq-charts-grid"></div>
+
+  <div class="card" style="margin-top:1.5rem">
+    <div class="card-title">Word Cloud — Select Corpus</div>
+    <div class="filter-row" id="cloud-corpus-btns">
+      <button class="filter-btn hca active" onclick="showCloud('hca')">HCA</button>
+      <button class="filter-btn grimms" onclick="showCloud('grimms')">Grimms</button>
+      <button class="filter-btn russian" onclick="showCloud('russian')">Russian</button>
+    </div>
+    <div id="word-cloud-wrap" style="width:100%;overflow:hidden">
+      <svg id="word-cloud-svg" style="width:100%;height:340px;display:block"></svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ COMPARISON ══ -->
+<section class="section" id="tab-comparison">
+  <h2 class="section-title">Cross-Corpus Comparison</h2>
+  <p class="section-desc">
+    Words that appear meaningfully in all three collections. The "skew" badge shows which corpus
+    uses each word most heavily. Sort, filter, and explore where the collections diverge.
+  </p>
+
+  <div class="card">
+    <div class="card-title">Top 25 Shared Terms — Grouped Bar Chart (per 10,000 tokens)</div>
+    <div class="chart-wrap" style="max-height:480px">
+      <canvas id="grouped-bar-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Shared Term Frequency Table</div>
+    <div class="table-controls">
+      <span style="font-size:.82rem;color:var(--muted)">Sort by:</span>
+      <select id="table-sort">
+        <option value="avg">Average Frequency</option>
+        <option value="hca">HCA Frequency</option>
+        <option value="grimms">Grimms Frequency</option>
+        <option value="russian">Russian Frequency</option>
+        <option value="skew">Most Skewed</option>
+        <option value="word">Alphabetical</option>
+      </select>
+      <input type="text" id="table-filter" placeholder="Filter words…" />
+    </div>
+    <div class="table-wrap">
+      <table class="comparison" id="comparison-table">
+        <thead>
+          <tr>
+            <th>Word</th>
+            <th style="color:var(--hca)">HCA</th>
+            <th style="color:var(--grimms)">Grimms</th>
+            <th style="color:var(--russian)">Russian</th>
+            <th>Skew</th>
+          </tr>
+        </thead>
+        <tbody id="comparison-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Most Contrasting Words</div>
+    <div class="card-subtitle">Words where one corpus uses the term 3× or more than the others (normalized frequency)</div>
+    <div id="contrast-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ THEMES ══ -->
+<section class="section" id="tab-themes">
+  <h2 class="section-title">Themes &amp; Motifs</h2>
+  <p class="section-desc">
+    Predefined thematic word groups scored by the summed normalized frequency of their member words
+    across each corpus. Select a theme to see a word-by-word breakdown.
+  </p>
+
+  <div class="card">
+    <div class="card-title">Theme Intensity by Corpus (per 10,000 tokens, summed)</div>
+    <div class="chart-wrap" style="max-height:460px">
+      <canvas id="theme-bar-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Radar Overview — Thematic Profile</div>
+    <div class="card-subtitle">Each axis is a theme; area shows relative emphasis per corpus</div>
+    <div class="chart-wrap" style="max-height:400px;max-width:500px;margin:0 auto">
+      <canvas id="theme-radar-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Word-Level Breakdown by Theme</div>
+    <div class="card-subtitle">Click a theme to explore individual word frequencies</div>
+    <div class="theme-selector" id="theme-selector"></div>
+    <div id="theme-breakdown-content"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ DIVERGENCE ══ -->
+<section class="section" id="tab-divergence">
+  <h2 class="section-title">Distinctive Words</h2>
+  <p class="section-desc">
+    Words that appear disproportionately in one collection relative to the others, revealing
+    thematic and stylistic distinctiveness. Computed using log-odds ratio against the combined
+    frequency of the other two corpora.
+  </p>
+  <div class="filter-row" id="divergence-filter">
+    <button class="filter-btn hca active" onclick="showDivergence('hca')">HCA Distinctive</button>
+    <button class="filter-btn grimms" onclick="showDivergence('grimms')">Grimms Distinctive</button>
+    <button class="filter-btn russian" onclick="showDivergence('russian')">Russian Distinctive</button>
+  </div>
+  <div class="card" id="divergence-card">
+    <div class="card-title" id="divergence-title">Words Distinctive to HCA</div>
+    <div class="chart-wrap" style="max-height:460px">
+      <canvas id="divergence-chart"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Log-Odds Scatter: All Three Corpora</div>
+    <p class="card-subtitle">
+      X-axis: relative prevalence in HCA vs Grimms. Y-axis: HCA vs Russian.
+      Words near center are shared; outliers are culturally distinctive.
     </p>
-
-    <div class="stats-grid" id="stats-grid"></div>
-
-    <div class="card">
-      <div class="card-title">Vocabulary Size Comparison</div>
-      <div class="chart-wrap" style="max-height:320px">
-        <canvas id="overview-bar-chart"></canvas>
-      </div>
+    <div id="scatter-wrap" style="width:100%;position:relative">
+      <svg id="scatter-svg" style="width:100%;display:block"></svg>
+      <div class="bubble-tip" id="scatter-tip"></div>
     </div>
+  </div>
+</section>
 
-    <div class="card">
-      <div class="card-title">Top 30 Shared Terms — Normalized Frequency (per 10,000 tokens)</div>
-      <div class="chart-wrap" style="max-height:420px">
-        <canvas id="shared-bar-chart"></canvas>
-      </div>
+<!-- ═══════════════════════════════════════ CONCORDANCE ══ -->
+<section class="section" id="tab-concordance">
+  <h2 class="section-title">Concordance Search</h2>
+  <p class="section-desc">
+    Search for any word and see it in sentence context across all three collections.
+    Sentences are loaded on first use (~1.2 MB); search is fully client-side.
+  </p>
+  <div class="conc-controls">
+    <div class="conc-input-wrap">
+      <label for="conc-search-input">Search word or phrase</label>
+      <input type="text" id="conc-search-input" placeholder="e.g. king, witch, water, forest…" autocomplete="off" />
     </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ FREQUENCIES ══ -->
-  <section class="section" id="tab-frequencies">
-    <h2 class="section-title">Word Frequency Distributions</h2>
-    <p class="section-desc">
-      Top 30 most frequent meaningful words in each collection. Toggle between raw counts and
-      normalized frequency (per 10,000 tokens) to compensate for the size difference between corpora.
-    </p>
-    <div style="margin-bottom:1.25rem">
-      <button class="filter-btn active" id="freq-mode-raw" onclick="setFreqMode('raw')">Raw Counts</button>
-      <button class="filter-btn" id="freq-mode-norm" style="border-color:#555;color:#555" onclick="setFreqMode('norm')">Per 10k Tokens</button>
-    </div>
-    <div class="charts-grid" id="freq-charts-grid"></div>
-
-    <div class="card" style="margin-top:1.5rem">
-      <div class="card-title">Word Cloud — Select Corpus</div>
-      <div style="display:flex;gap:.5rem;margin-bottom:1rem" id="cloud-corpus-btns">
-        <button class="filter-btn hca active" onclick="showCloud('hca')">HCA</button>
-        <button class="filter-btn grimms" onclick="showCloud('grimms')">Grimms</button>
-        <button class="filter-btn russian" onclick="showCloud('russian')">Russian</button>
-      </div>
-      <div id="word-cloud-wrap" style="width:100%;overflow:hidden">
-        <svg id="word-cloud-svg" style="width:100%;height:320px;display:block"></svg>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ COMPARISON ══ -->
-  <section class="section" id="tab-comparison">
-    <h2 class="section-title">Cross-Corpus Comparison</h2>
-    <p class="section-desc">
-      Words that appear meaningfully in all three collections. Bars show normalized frequency
-      (per 10,000 tokens). Sort and filter to explore patterns across cultures and authors.
-    </p>
-
-    <div class="card">
-      <div class="card-title">Top Shared Terms — Grouped Bar Chart</div>
-      <div class="chart-wrap" style="max-height:500px">
-        <canvas id="grouped-bar-chart"></canvas>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Shared Term Frequency Table</div>
-      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap">
-        <span style="font-size:.82rem;color:var(--muted)">Sort by:</span>
-        <select id="table-sort" style="padding:.3rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:inherit">
-          <option value="avg">Average Frequency</option>
-          <option value="hca">HCA Frequency</option>
-          <option value="grimms">Grimms Frequency</option>
-          <option value="russian">Russian Frequency</option>
-          <option value="word">Alphabetical</option>
-        </select>
-        <input type="text" id="table-filter" placeholder="Filter words…"
-          style="padding:.3rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:inherit;flex:1;min-width:120px" />
-      </div>
-      <div class="comparison-table-wrap" style="max-height:500px;overflow-y:auto">
-        <table class="comparison" id="comparison-table">
-          <thead>
-            <tr>
-              <th>Word</th>
-              <th style="color:var(--hca)">HCA</th>
-              <th style="color:var(--grimms)">Grimms</th>
-              <th style="color:var(--russian)">Russian</th>
-            </tr>
-          </thead>
-          <tbody id="comparison-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ DIVERGENCE ══ -->
-  <section class="section" id="tab-divergence">
-    <h2 class="section-title">Distinctive Words</h2>
-    <p class="section-desc">
-      Words that appear disproportionately in one collection relative to the others, revealing
-      thematic and stylistic distinctiveness. Computed using log-odds ratio against the combined
-      frequency of the other two corpora.
-    </p>
-    <div class="divergence-filter">
-      <button class="filter-btn hca active" onclick="showDivergence('hca')">HCA Distinctive</button>
-      <button class="filter-btn grimms" onclick="showDivergence('grimms')">Grimms Distinctive</button>
-      <button class="filter-btn russian" onclick="showDivergence('russian')">Russian Distinctive</button>
-    </div>
-    <div class="card" id="divergence-card">
-      <div class="card-title" id="divergence-title">Words Distinctive to HCA</div>
-      <div class="chart-wrap" style="max-height:450px">
-        <canvas id="divergence-chart"></canvas>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-title">Log-Odds Scatter: All Three Corpora</div>
-      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">
-        Each dot is a word. Position on X-axis shows relative prevalence in HCA vs Grimms;
-        Y-axis shows HCA vs Russian. Words in the center are shared; outliers are distinctive.
-      </p>
-      <div id="scatter-wrap" style="width:100%;position:relative">
-        <svg id="scatter-svg" style="width:100%;display:block"></svg>
-        <div class="bubble-tip" id="scatter-tip"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════ CONCORDANCE ══ -->
-  <section class="section" id="tab-concordance">
-    <h2 class="section-title">Concordance Search</h2>
-    <p class="section-desc">
-      Search for any word and see it in context across all three collections. Pre-computed
-      concordances are available for the top 40 shared terms; other words will search the
-      frequency data.
-    </p>
-    <div class="conc-controls">
-      <div class="conc-input-wrap">
-        <label for="conc-search-input">Search word</label>
-        <input type="text" id="conc-search-input" placeholder="e.g. king, water, forest…" autocomplete="off" />
-      </div>
-      <button class="btn-search" onclick="searchConcordance()">Search</button>
-    </div>
-    <div>
-      <span style="font-size:.82rem;color:var(--muted);margin-right:.5rem">Try:</span>
-      <div class="suggestions" id="concordance-suggestions"></div>
-    </div>
-    <div class="conc-results-grid" id="conc-results"></div>
-  </section>
+    <button class="btn-primary" onclick="searchConcordance()">Search</button>
+  </div>
+  <div>
+    <span style="font-size:.82rem;color:var(--muted);margin-right:.5rem">Try:</span>
+    <div class="suggestions" id="concordance-suggestions"></div>
+  </div>
+  <div id="conc-status" style="font-size:.85rem;color:var(--muted);margin-bottom:1rem"></div>
+  <div class="conc-results-grid" id="conc-results"></div>
+</section>
 
 </main>
 
 <script>
 // ─────────────────────────────── DATA LOADING ───────────────────────────────
-let CORPORA = null, SHARED = null, CONCORDANCE = null, FREQ_TABLE = null;
+let CORPORA = null, SHARED = null, CONCORDANCE = null, FREQ_TABLE = null, THEMES = null;
+let SENTENCES = null;  // loaded lazily when concordance tab is first opened
+let sentencesLoading = false, sentencesLoaded = false;
 
 const COLORS = { hca: '#4e79a7', grimms: '#f28e2b', russian: '#e15759' };
 const LABELS = { hca: 'HCA', grimms: 'Grimms', russian: 'Russian' };
@@ -564,12 +706,30 @@ const FULL_LABELS = {
 };
 
 async function loadData() {
-  [CORPORA, SHARED, CONCORDANCE, FREQ_TABLE] = await Promise.all([
+  [CORPORA, SHARED, CONCORDANCE, FREQ_TABLE, THEMES] = await Promise.all([
     fetch('data/corpora.json').then(r => r.json()),
     fetch('data/shared.json').then(r => r.json()),
     fetch('data/concordance.json').then(r => r.json()),
     fetch('data/freq_table.json').then(r => r.json()),
+    fetch('data/themes.json').then(r => r.json()),
   ]);
+}
+
+async function ensureSentences() {
+  if (sentencesLoaded) return true;
+  if (sentencesLoading) return false;
+  sentencesLoading = true;
+  document.getElementById('conc-status').textContent = 'Loading full sentence data…';
+  try {
+    SENTENCES = await fetch('data/sentences.json').then(r => r.json());
+    sentencesLoaded = true;
+    document.getElementById('conc-status').textContent = '';
+    return true;
+  } catch(e) {
+    document.getElementById('conc-status').textContent = 'Failed to load sentence data: ' + e.message;
+    sentencesLoading = false;
+    return false;
+  }
 }
 
 // ─────────────────────────────── TABS ───────────────────────────────────────
@@ -579,22 +739,70 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
     btn.classList.add('active');
     document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    if (btn.dataset.tab === 'concordance' && !sentencesLoaded && !sentencesLoading) {
+      ensureSentences();
+    }
   });
 });
+
+// ─────────────────────────────── HELPERS ────────────────────────────────────
+function corpusFor(key) { return CORPORA.find(c => c.key === key); }
+function wordFreqNorm(corpus, word) {
+  const entry = corpus.top_words.find(w => w.word === word);
+  return entry ? entry.count / corpus.total_tokens * 10000 : 0;
+}
 
 // ─────────────────────────────── OVERVIEW ───────────────────────────────────
 function buildOverview() {
   const grid = document.getElementById('stats-grid');
   CORPORA.forEach(c => {
     const topWords = c.top_words.slice(0, 5).map(w => w.word).join(', ');
+    const richness = (c.unique_tokens / c.total_tokens * 100).toFixed(1);
     grid.innerHTML += `
       <div class="stat-card ${c.key}">
         <div class="stat-corpus" style="color:${c.color}">${c.label}</div>
-        <div class="stat-row"><span class="stat-label">Total tokens (content words)</span><span class="stat-value">${c.total_tokens.toLocaleString()}</span></div>
-        <div class="stat-row"><span class="stat-label">Unique vocabulary</span><span class="stat-value">${c.unique_tokens.toLocaleString()}</span></div>
-        <div class="stat-row"><span class="stat-label">Lexical richness</span><span class="stat-value">${(c.unique_tokens / c.total_tokens * 100).toFixed(1)}%</span></div>
-        <div class="stat-row"><span class="stat-label">Top 5 words</span><span class="stat-value" style="font-size:.78rem">${topWords}</span></div>
+        <div class="stat-row">
+          <span class="stat-label">Total content-word tokens</span>
+          <span class="stat-value">${c.total_tokens.toLocaleString()}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Unique vocabulary</span>
+          <span class="stat-value">${c.unique_tokens.toLocaleString()}</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Lexical richness (TTR)</span>
+          <span class="stat-value">${richness}%</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">Top 5 words</span>
+          <span class="stat-value" style="font-size:.76rem">${topWords}</span>
+        </div>
       </div>`;
+  });
+
+  // Insights
+  const hca = corpusFor('hca'), gr = corpusFor('grimms'), ru = corpusFor('russian');
+  const insights = [
+    {
+      label: 'Lexical Diversity',
+      text: `Russian Tales has the highest type-token ratio (${(ru.unique_tokens/ru.total_tokens*100).toFixed(1)}% vs HCA ${(hca.unique_tokens/hca.total_tokens*100).toFixed(1)}%), suggesting more varied vocabulary per unit of text.`,
+    },
+    {
+      label: 'Scale',
+      text: `HCA is ${(hca.total_tokens / gr.total_tokens).toFixed(1)}× larger than Grimms — always use normalized frequencies for fair comparison.`,
+    },
+    {
+      label: 'Royalty Focus',
+      text: `"King" appears ${SHARED.find(s=>s.word==='king')?.normalized.grimms.toFixed(1) || '?'}/10k in Grimms vs ${SHARED.find(s=>s.word==='king')?.normalized.hca.toFixed(1) || '?'}/10k in HCA — Grimms are markedly more royalty-centered.`,
+    },
+    {
+      label: 'Shared Core',
+      text: `${SHARED.length} words appear meaningfully in all three corpora, providing a cross-cultural "fairy tale lexicon." Explore them in the Comparison tab.`,
+    },
+  ];
+  const ig = document.getElementById('overview-insights');
+  insights.forEach(ins => {
+    ig.innerHTML += `<div class="insight-chip"><strong>${ins.label}</strong>${ins.text}</div>`;
   });
 
   // Vocab comparison chart
@@ -613,10 +821,10 @@ function buildOverview() {
         {
           label: 'Unique Words',
           data: CORPORA.map(c => c.unique_tokens),
-          backgroundColor: CORPORA.map(c => c.color + '55'),
+          backgroundColor: CORPORA.map(c => c.color + '33'),
           borderColor: CORPORA.map(c => c.color),
           borderWidth: 2,
-          borderDash: [4, 3],
+          borderDash: [5, 3],
         }
       ]
     },
@@ -630,7 +838,7 @@ function buildOverview() {
     }
   });
 
-  // Shared terms bar
+  // Shared terms grouped bar
   const top30 = SHARED.slice(0, 30);
   new Chart(document.getElementById('shared-bar-chart'), {
     type: 'bar',
@@ -649,15 +857,17 @@ function buildOverview() {
       plugins: { legend: { position: 'top' } },
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 45 } },
-        y: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Freq per 10k tokens' } }
+        y: {
+          grid: { color: '#f0ede5' },
+          title: { display: true, text: 'Freq per 10k tokens' }
+        }
       }
     }
   });
 }
 
 // ─────────────────────────────── FREQUENCIES ────────────────────────────────
-let freqCharts = {};
-let freqMode = 'raw';
+let freqCharts = {}, freqMode = 'raw';
 
 function setFreqMode(mode) {
   freqMode = mode;
@@ -670,8 +880,8 @@ function updateFreqChart(c) {
   const chart = freqCharts[c.key];
   if (!chart) return;
   const top30 = c.top_words.slice(0, 30);
-  chart.data.datasets[0].data = top30.map(w => freqMode === 'raw' ? w.count : w.freq);
-  chart.options.scales.y.title.text = freqMode === 'raw' ? 'Count' : 'Per 10k tokens';
+  chart.data.datasets[0].data = top30.map(w => freqMode === 'raw' ? w.count : w.freq * 10);
+  chart.options.scales.x.title.text = freqMode === 'raw' ? 'Count' : 'Per 10k tokens';
   chart.update();
 }
 
@@ -718,64 +928,55 @@ let activeCloud = 'hca';
 function showCloud(key) {
   activeCloud = key;
   document.querySelectorAll('#cloud-corpus-btns .filter-btn').forEach(b => {
-    b.classList.toggle('active', b.textContent.toLowerCase() === key ||
-      (key === 'grimms' && b.textContent === 'Grimms') ||
-      (key === 'hca' && b.textContent === 'HCA') ||
-      (key === 'russian' && b.textContent === 'Russian')
-    );
+    const map = { hca: 'HCA', grimms: 'Grimms', russian: 'Russian' };
+    b.classList.toggle('active', b.textContent.trim() === map[key]);
   });
   buildWordCloud(key);
 }
 
 function buildWordCloud(key) {
-  const corpus = CORPORA.find(c => c.key === key);
-  const svg = document.getElementById('word-cloud-svg');
-  const w = svg.clientWidth || 600;
-  const h = 320;
-  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-  svg.innerHTML = '';
+  const corpus = corpusFor(key);
+  const svgEl = document.getElementById('word-cloud-svg');
+  const w = svgEl.clientWidth || 600;
+  const h = 340;
+  svgEl.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svgEl.innerHTML = '';
 
-  const words = corpus.top_words.slice(0, 80);
-  const maxCount = words[0].count;
-  const minCount = words[words.length - 1].count;
+  const words = corpus.top_words.slice(0, 100);
+  const maxC = words[0].count, minC = words[words.length - 1].count;
+  const sizeScale = d3.scaleLinear().domain([minC, maxC]).range([11, 50]);
+  const colorInterp = key === 'hca' ? d3.interpolateBlues :
+                      key === 'grimms' ? d3.interpolateOranges : d3.interpolateReds;
 
-  const scale = d3.scaleLinear().domain([minCount, maxCount]).range([11, 46]);
-  const color = d3.scaleSequential(d3.interpolateBlues).domain([minCount, maxCount]);
-
-  // Simple random placement with collision avoidance
   const placed = [];
-  const rng = (min, max) => Math.random() * (max - min) + min;
+  const rng = (a, b) => Math.random() * (b - a) + a;
 
-  words.forEach(w_item => {
-    const fontSize = scale(w_item.count);
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.textContent = w_item.word;
-    text.setAttribute('font-size', fontSize);
-    text.setAttribute('font-family', 'Inter, sans-serif');
-    text.setAttribute('fill', key === 'hca' ? d3.interpolateBlues(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)) :
-                              key === 'grimms' ? d3.interpolateOranges(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)) :
-                              d3.interpolateReds(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)));
-
-    const approxW = w_item.word.length * fontSize * 0.58;
-    const approxH = fontSize;
-
-    let attempts = 0;
-    let x, y, fits;
+  words.forEach(item => {
+    const fontSize = sizeScale(item.count);
+    const approxW = item.word.length * fontSize * 0.56;
+    const approxH = fontSize * 1.2;
+    let x, y, fits, attempts = 0;
     do {
       x = rng(approxW / 2, w - approxW / 2);
       y = rng(approxH, h - 8);
-      fits = placed.every(p => {
-        return !(Math.abs(x - p.x) < (approxW + p.w) / 2 + 4 &&
-                 Math.abs(y - p.y) < (approxH + p.h) / 2 + 4);
-      });
+      fits = placed.every(p =>
+        !(Math.abs(x - p.x) < (approxW + p.w) / 2 + 5 &&
+          Math.abs(y - p.y) < (approxH + p.h) / 2 + 3)
+      );
       attempts++;
-    } while (!fits && attempts < 120);
+    } while (!fits && attempts < 150);
 
-    if (fits || attempts >= 120) {
+    if (fits || attempts >= 150) {
+      const t = (item.count - minC) / (maxC - minC);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.textContent = item.word;
       text.setAttribute('x', x);
       text.setAttribute('y', y);
+      text.setAttribute('font-size', fontSize);
+      text.setAttribute('font-family', 'Inter, sans-serif');
+      text.setAttribute('fill', colorInterp(0.35 + 0.65 * t));
       text.setAttribute('text-anchor', 'middle');
-      svg.appendChild(text);
+      svgEl.appendChild(text);
       placed.push({ x, y, w: approxW, h: approxH });
     }
   });
@@ -785,14 +986,14 @@ function buildWordCloud(key) {
 let groupedChart = null;
 
 function buildComparison() {
-  const top20 = SHARED.slice(0, 20);
+  const top25 = SHARED.slice(0, 25);
   groupedChart = new Chart(document.getElementById('grouped-bar-chart'), {
     type: 'bar',
     data: {
-      labels: top20.map(s => s.word),
+      labels: top25.map(s => s.word),
       datasets: CORPORA.map(c => ({
         label: c.label,
-        data: top20.map(s => s.normalized[c.key]),
+        data: top25.map(s => s.normalized[c.key]),
         backgroundColor: c.color + 'cc',
         borderColor: c.color,
         borderWidth: 1,
@@ -803,19 +1004,25 @@ function buildComparison() {
       plugins: { legend: { position: 'top' } },
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 30 } },
-        y: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Freq per 10k tokens' } }
+        y: {
+          grid: { color: '#f0ede5' },
+          title: { display: true, text: 'Freq per 10k tokens' }
+        }
       }
     }
   });
 
   renderComparisonTable(SHARED);
+  buildContrastSection();
 
-  document.getElementById('table-sort').addEventListener('change', () => {
-    filterAndSortTable();
-  });
-  document.getElementById('table-filter').addEventListener('input', () => {
-    filterAndSortTable();
-  });
+  document.getElementById('table-sort').addEventListener('change', filterAndSortTable);
+  document.getElementById('table-filter').addEventListener('input', filterAndSortTable);
+}
+
+function skewScore(row) {
+  const vals = CORPORA.map(c => row.normalized[c.key]);
+  const max = Math.max(...vals), sum = vals.reduce((a, b) => a + b, 0);
+  return sum > 0 ? max / (sum / vals.length) : 1;
 }
 
 function filterAndSortTable() {
@@ -823,26 +1030,171 @@ function filterAndSortTable() {
   const filter = document.getElementById('table-filter').value.toLowerCase().trim();
   let data = [...SHARED];
   if (filter) data = data.filter(d => d.word.includes(filter));
-  if (sort === 'avg') data.sort((a, b) => b.avg_norm - a.avg_norm);
-  else if (sort === 'word') data.sort((a, b) => a.word.localeCompare(b.word));
+  if (sort === 'avg')    data.sort((a, b) => b.avg_norm - a.avg_norm);
+  else if (sort === 'word')  data.sort((a, b) => a.word.localeCompare(b.word));
+  else if (sort === 'skew')  data.sort((a, b) => skewScore(b) - skewScore(a));
   else data.sort((a, b) => b.normalized[sort] - a.normalized[sort]);
   renderComparisonTable(data);
 }
 
 function renderComparisonTable(data) {
-  const maxNorm = Math.max(...SHARED.map(s => Math.max(...CORPORA.map(c => s.normalized[c.key]))));
+  const maxNorm = Math.max(...SHARED.flatMap(s => CORPORA.map(c => s.normalized[c.key])));
   const tbody = document.getElementById('comparison-tbody');
   tbody.innerHTML = data.map(row => {
+    const vals = CORPORA.map(c => row.normalized[c.key]);
+    const maxVal = Math.max(...vals);
+    const maxCorpus = CORPORA[vals.indexOf(maxVal)];
+    const ratio = maxVal / (Math.min(...vals) + 0.01);
+    const skewLabel = ratio >= 2
+      ? `<span class="ratio-badge ratio-${maxCorpus.key}">${maxCorpus.short} ×${ratio.toFixed(1)}</span>`
+      : `<span class="ratio-badge ratio-equal">shared</span>`;
+
     const cells = CORPORA.map(c => {
       const val = row.normalized[c.key];
-      const barW = Math.round(val / maxNorm * 120);
+      const barW = Math.round(val / maxNorm * 110);
       return `<td><div class="bar-cell">
         <div class="mini-bar bar-${c.key}" style="width:${barW}px"></div>
-        <span style="font-size:.8rem;color:var(--muted)">${val.toFixed(1)}</span>
+        <span style="font-size:.79rem;color:var(--muted)">${val.toFixed(1)}</span>
       </div></td>`;
     }).join('');
-    return `<tr><td><strong>${row.word}</strong></td>${cells}</tr>`;
+    return `<tr><td><strong>${row.word}</strong></td>${cells}<td>${skewLabel}</td></tr>`;
   }).join('');
+}
+
+function buildContrastSection() {
+  const contrasts = [];
+  SHARED.forEach(row => {
+    const vals = CORPORA.map(c => ({ key: c.key, label: c.label, val: row.normalized[c.key], color: c.color }));
+    vals.sort((a, b) => b.val - a.val);
+    const ratio = vals[0].val / (vals[vals.length - 1].val + 0.01);
+    if (ratio >= 3) contrasts.push({ word: row.word, vals, ratio });
+  });
+  contrasts.sort((a, b) => b.ratio - a.ratio);
+
+  const grid = document.getElementById('contrast-grid');
+  if (contrasts.length === 0) {
+    grid.innerHTML = '<p style="color:var(--muted);font-size:.85rem">No words with 3× contrast found.</p>';
+    return;
+  }
+  contrasts.slice(0, 12).forEach(item => {
+    const barMax = item.vals[0].val;
+    const barsHtml = item.vals.map(v => `
+      <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem">
+        <span style="font-size:.75rem;width:54px;color:var(--muted)">${v.label.split(' ')[0]}</span>
+        <div style="height:9px;border-radius:5px;background:${v.color}cc;width:${Math.round(v.val/barMax*120)}px;min-width:2px"></div>
+        <span style="font-size:.75rem;color:var(--muted)">${v.val.toFixed(1)}</span>
+      </div>`).join('');
+    grid.innerHTML += `
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem">
+        <div style="font-weight:700;margin-bottom:.6rem;font-size:.9rem">
+          "${item.word}"
+          <span class="ratio-badge ratio-${item.vals[0].key}" style="margin-left:.4rem">
+            ${item.vals[0].label.split(' ')[0]} ×${item.ratio.toFixed(1)}
+          </span>
+        </div>
+        ${barsHtml}
+      </div>`;
+  });
+}
+
+// ─────────────────────────────── THEMES ─────────────────────────────────────
+function buildThemes() {
+  // Grouped horizontal bar: all themes × 3 corpora
+  const themeLabels = THEMES.map(t => t.icon + ' ' + t.name);
+  new Chart(document.getElementById('theme-bar-chart'), {
+    type: 'bar',
+    data: {
+      labels: themeLabels,
+      datasets: CORPORA.map(c => ({
+        label: c.label,
+        data: THEMES.map(t => t.scores[c.key]),
+        backgroundColor: c.color + 'cc',
+        borderColor: c.color,
+        borderWidth: 1,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      indexAxis: 'y',
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: {
+          grid: { color: '#f0ede5' },
+          title: { display: true, text: 'Summed freq per 10k tokens' }
+        },
+        y: { grid: { display: false }, ticks: { font: { size: 12 } } }
+      }
+    }
+  });
+
+  // Radar chart
+  new Chart(document.getElementById('theme-radar-chart'), {
+    type: 'radar',
+    data: {
+      labels: THEMES.map(t => t.name),
+      datasets: CORPORA.map(c => ({
+        label: c.label,
+        data: THEMES.map(t => t.scores[c.key]),
+        borderColor: c.color,
+        backgroundColor: c.color + '22',
+        pointBackgroundColor: c.color,
+        borderWidth: 2,
+        pointRadius: 3,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        r: {
+          grid: { color: '#e8e4dc' },
+          ticks: { display: false },
+          pointLabels: { font: { size: 11 } }
+        }
+      }
+    }
+  });
+
+  // Theme selector buttons
+  const sel = document.getElementById('theme-selector');
+  THEMES.forEach((theme, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'theme-btn' + (i === 0 ? ' active' : '');
+    btn.innerHTML = `<span class="theme-icon">${theme.icon}</span>${theme.name}`;
+    btn.onclick = () => {
+      document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderThemeBreakdown(theme);
+    };
+    sel.appendChild(btn);
+  });
+
+  // Render first theme by default
+  renderThemeBreakdown(THEMES[0]);
+}
+
+function renderThemeBreakdown(theme) {
+  const container = document.getElementById('theme-breakdown-content');
+  const maxVal = Math.max(
+    ...CORPORA.flatMap(c => theme.words.map(w => theme.word_scores[c.key][w] || 0))
+  ) || 1;
+
+  container.innerHTML = '<div class="theme-breakdown">' +
+    theme.words.map(word => {
+      const barsHtml = CORPORA.map(c => {
+        const val = theme.word_scores[c.key][word] || 0;
+        const w = Math.round(val / maxVal * 90);
+        return `<div class="theme-word-bar-row">
+          <span style="width:48px;flex-shrink:0">${c.short}</span>
+          <div class="theme-word-bar-fill bar-${c.key}" style="width:${w}px"></div>
+          <span>${val.toFixed(1)}</span>
+        </div>`;
+      }).join('');
+      return `<div class="theme-word-row">
+        <div class="theme-word-label">${word}</div>
+        <div class="theme-word-bars">${barsHtml}</div>
+      </div>`;
+    }).join('') + '</div>';
 }
 
 // ─────────────────────────────── DIVERGENCE ─────────────────────────────────
@@ -850,7 +1202,6 @@ let divergenceChart = null;
 let activeDivCorpus = 'hca';
 
 function computeLogOdds() {
-  // For each word in SHARED, compute log-odds for each corpus vs. combined others
   return SHARED.map(item => {
     const result = { word: item.word };
     CORPORA.forEach(c => {
@@ -865,26 +1216,24 @@ function computeLogOdds() {
 
 function showDivergence(key) {
   activeDivCorpus = key;
-  document.querySelectorAll('.divergence-filter .filter-btn').forEach(b => {
-    b.classList.remove('active');
-    if (b.textContent.toLowerCase().startsWith(LABELS[key].toLowerCase())) b.classList.add('active');
+  document.querySelectorAll('#divergence-filter .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(LABELS[key].toLowerCase()));
   });
 
   const logOdds = computeLogOdds();
   logOdds.sort((a, b) => b['logodds_' + key] - a['logodds_' + key]);
-  const top20 = logOdds.slice(0, 20);
-
-  const corpus = CORPORA.find(c => c.key === key);
+  const top25 = logOdds.slice(0, 25);
+  const corpus = corpusFor(key);
   document.getElementById('divergence-title').textContent = `Words Distinctive to ${corpus.label}`;
 
   if (divergenceChart) divergenceChart.destroy();
   divergenceChart = new Chart(document.getElementById('divergence-chart'), {
     type: 'bar',
     data: {
-      labels: top20.map(d => d.word),
+      labels: top25.map(d => d.word),
       datasets: [{
         label: 'Log-Odds Ratio',
-        data: top20.map(d => +d['logodds_' + key].toFixed(3)),
+        data: top25.map(d => +d['logodds_' + key].toFixed(3)),
         backgroundColor: corpus.color + 'cc',
         borderColor: corpus.color,
         borderWidth: 1,
@@ -894,7 +1243,7 @@ function showDivergence(key) {
       responsive: true, maintainAspectRatio: true,
       plugins: { legend: { display: false } },
       scales: {
-        x: { grid: { display: false }, ticks: { maxRotation: 30 } },
+        x: { grid: { display: false }, ticks: { maxRotation: 35 } },
         y: {
           grid: { color: '#f0ede5' },
           title: { display: true, text: 'Log-Odds vs. Other Corpora' }
@@ -908,10 +1257,10 @@ function buildScatterPlot() {
   const logOdds = computeLogOdds();
   const svg = d3.select('#scatter-svg');
   const container = document.getElementById('scatter-wrap');
-  const totalW = container.clientWidth || 600;
-  const margin = { top: 20, right: 20, bottom: 50, left: 55 };
+  const totalW = container.clientWidth || 640;
+  const margin = { top: 24, right: 24, bottom: 54, left: 60 };
   const w = totalW - margin.left - margin.right;
-  const h = Math.min(w * 0.65, 420);
+  const h = Math.min(w * 0.62, 430);
   svg.attr('height', h + margin.top + margin.bottom)
      .attr('viewBox', `0 0 ${totalW} ${h + margin.top + margin.bottom}`);
 
@@ -919,11 +1268,16 @@ function buildScatterPlot() {
 
   const xs = logOdds.map(d => d.logodds_hca - d.logodds_grimms);
   const ys = logOdds.map(d => d.logodds_hca - d.logodds_russian);
-  const xExt = d3.extent(xs);
-  const yExt = d3.extent(ys);
 
-  const xScale = d3.scaleLinear().domain(xExt).nice().range([0, w]);
-  const yScale = d3.scaleLinear().domain(yExt).nice().range([h, 0]);
+  const xScale = d3.scaleLinear().domain(d3.extent(xs)).nice().range([0, w]);
+  const yScale = d3.scaleLinear().domain(d3.extent(ys)).nice().range([h, 0]);
+
+  // Gridlines
+  g.append('g').call(d3.axisBottom(xScale).ticks(6).tickSize(h).tickFormat(''))
+    .attr('transform', 'translate(0,0)')
+    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
+  g.append('g').call(d3.axisLeft(yScale).ticks(6).tickSize(-w).tickFormat(''))
+    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
 
   // Axes
   g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(6))
@@ -931,60 +1285,61 @@ function buildScatterPlot() {
   g.append('g').call(d3.axisLeft(yScale).ticks(6))
     .selectAll('text').style('fill', '#888').style('font-size', '11px');
 
-  // Gridlines
-  g.append('g').attr('class', 'grid')
-    .call(d3.axisBottom(xScale).ticks(6).tickSize(h).tickFormat(''))
-    .attr('transform', 'translate(0,0)')
-    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
-  g.append('g').attr('class', 'grid')
-    .call(d3.axisLeft(yScale).ticks(6).tickSize(-w).tickFormat(''))
-    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
-
   // Zero lines
   g.append('line').attr('x1', xScale(0)).attr('x2', xScale(0)).attr('y1', 0).attr('y2', h)
-    .style('stroke', '#ccc').style('stroke-width', 1);
+    .style('stroke', '#bbb').style('stroke-width', 1).style('stroke-dasharray', '4,3');
   g.append('line').attr('x1', 0).attr('x2', w).attr('y1', yScale(0)).attr('y2', yScale(0))
-    .style('stroke', '#ccc').style('stroke-width', 1);
+    .style('stroke', '#bbb').style('stroke-width', 1).style('stroke-dasharray', '4,3');
 
-  // Quadrant labels
-  const qStyle = { fill: '#bbb', 'font-size': '10px', 'font-style': 'italic' };
-  g.append('text').attr('x', w - 4).attr('y', 14).attr('text-anchor', 'end').text('← HCA distinctive →').style('fill', '#bbb').style('font-size', '10px');
-  g.append('text').attr('x', 4).attr('y', 14).text('← Grimms').style('fill', '#bbb').style('font-size', '10px');
+  // Quadrant hints
+  [
+    [w - 4, 14, 'end', 'HCA →'],
+    [4, 14, 'start', '← Grimms'],
+    [w / 2, 14, 'middle', ''],
+  ].forEach(([x, y, anchor, txt]) => {
+    if (!txt) return;
+    g.append('text').attr('x', x).attr('y', y).attr('text-anchor', anchor)
+      .text(txt).style('fill', '#bbb').style('font-size', '10px');
+  });
 
   // Dots
   const tip = document.getElementById('scatter-tip');
   g.selectAll('circle').data(logOdds).enter().append('circle')
     .attr('cx', (d, i) => xScale(xs[i]))
     .attr('cy', (d, i) => yScale(ys[i]))
-    .attr('r', 5)
+    .attr('r', 5.5)
     .attr('fill', d => {
-      // Color by most distinctive corpus
-      const hca_v = d.logodds_hca;
-      const gr_v = d.logodds_grimms;
-      const ru_v = d.logodds_russian;
-      if (hca_v > gr_v && hca_v > ru_v) return COLORS.hca + 'cc';
-      if (gr_v > hca_v && gr_v > ru_v) return COLORS.grimms + 'cc';
+      if (d.logodds_hca > d.logodds_grimms && d.logodds_hca > d.logodds_russian) return COLORS.hca + 'cc';
+      if (d.logodds_grimms > d.logodds_hca && d.logodds_grimms > d.logodds_russian) return COLORS.grimms + 'cc';
       return COLORS.russian + 'cc';
     })
-    .attr('stroke', '#fff')
-    .attr('stroke-width', 1)
-    .style('cursor', 'default')
+    .attr('stroke', '#fff').attr('stroke-width', 1.2)
+    .style('cursor', 'pointer')
     .on('mouseover', function(event, d) {
       const i = logOdds.indexOf(d);
-      d3.select(this).attr('r', 8);
+      d3.select(this).attr('r', 9);
       tip.style.opacity = '1';
-      tip.style.left = (event.offsetX + 12) + 'px';
-      tip.style.top = (event.offsetY - 28) + 'px';
+      tip.style.left = (event.offsetX + 14) + 'px';
+      tip.style.top  = (event.offsetY - 32) + 'px';
       tip.textContent = `"${d.word}" — HCA↔Grimms: ${xs[i].toFixed(2)}, HCA↔Russian: ${ys[i].toFixed(2)}`;
     })
     .on('mouseout', function() {
-      d3.select(this).attr('r', 5);
+      d3.select(this).attr('r', 5.5);
       tip.style.opacity = '0';
+    })
+    .on('click', (event, d) => {
+      document.getElementById('conc-search-input').value = d.word;
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelector('[data-tab="concordance"]').classList.add('active');
+      document.getElementById('tab-concordance').classList.add('active');
+      if (!sentencesLoaded && !sentencesLoading) ensureSentences().then(ok => ok && searchConcordance());
+      else searchConcordance();
     });
 
-  // Labels for outlier words
+  // Labels for outliers (top 20% by distance from origin)
   const allR = logOdds.map((d, i) => Math.sqrt(xs[i] ** 2 + ys[i] ** 2));
-  const threshold = d3.quantile(allR.sort(d3.ascending), 0.8);
+  const threshold = d3.quantile([...allR].sort(d3.ascending), 0.80);
   logOdds.forEach((d, i) => {
     if (allR[i] >= threshold) {
       g.append('text')
@@ -998,18 +1353,19 @@ function buildScatterPlot() {
 
   // Axis labels
   svg.append('text')
-    .attr('x', totalW / 2).attr('y', h + margin.top + margin.bottom - 4)
+    .attr('x', totalW / 2).attr('y', h + margin.top + margin.bottom - 6)
     .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
-    .text('HCA vs Grimms (log-odds difference)');
+    .text('HCA vs Grimms (log-odds difference → more Grimms | more HCA →)');
   svg.append('text')
     .attr('transform', `translate(14,${(h + margin.top + margin.bottom) / 2}) rotate(-90)`)
     .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
-    .text('HCA vs Russian (log-odds difference)');
+    .text('HCA vs Russian (↑ more HCA | ↓ more Russian)');
 }
 
 // ─────────────────────────────── CONCORDANCE ────────────────────────────────
 function buildConcordance() {
-  const suggestions = Object.keys(CONCORDANCE).slice(0, 20);
+  // Suggestion chips from top shared terms
+  const suggestions = SHARED.slice(0, 25).map(s => s.word);
   const container = document.getElementById('concordance-suggestions');
   suggestions.forEach(w => {
     const btn = document.createElement('button');
@@ -1026,9 +1382,16 @@ function buildConcordance() {
     if (e.key === 'Enter') searchConcordance();
   });
 
-  // Default search
+  // Default search on open
   document.getElementById('conc-search-input').value = 'king';
   searchConcordance();
+}
+
+function highlightInText(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp('\\b' + escaped + '\\b', 'gi'),
+    m => `<mark>${m}</mark>`);
 }
 
 function searchConcordance() {
@@ -1038,23 +1401,70 @@ function searchConcordance() {
   const results = document.getElementById('conc-results');
   results.innerHTML = '';
 
-  const entries = CONCORDANCE[query];
+  // Try pre-computed concordance first (exact word match)
+  if (CONCORDANCE[query]) {
+    renderConcordanceResults(query, CONCORDANCE[query]);
+    document.getElementById('conc-status').textContent =
+      `Pre-computed concordance for "${query}" (up to 25 sentences per corpus).`;
+    return;
+  }
+
+  // Fall back to sentence search
+  if (!sentencesLoaded) {
+    if (!sentencesLoading) ensureSentences();
+    document.getElementById('conc-status').textContent = 'Loading sentence data for search…';
+    // Poll briefly then retry
+    const poll = setInterval(() => {
+      if (sentencesLoaded) { clearInterval(poll); searchConcordance(); }
+    }, 300);
+    return;
+  }
+
+  // Client-side sentence search
+  const searchResults = {};
+  CORPORA.forEach(c => {
+    const sents = SENTENCES[c.key] || [];
+    const matches = [];
+    for (const sent of sents) {
+      if (sent.toLowerCase().includes(query)) {
+        matches.push({
+          text: sent,
+          highlighted: highlightInText(sent, query)
+        });
+        if (matches.length >= 25) break;
+      }
+    }
+    searchResults[c.key] = matches;
+  });
+
+  renderConcordanceResults(query, searchResults);
+  const totalMatches = Object.values(searchResults).reduce((s, a) => s + a.length, 0);
+  document.getElementById('conc-status').textContent =
+    totalMatches > 0
+      ? `Found ${totalMatches} sentence${totalMatches !== 1 ? 's' : ''} containing "${query}" across all corpora.`
+      : `No results found for "${query}". Try a different word.`;
+}
+
+function renderConcordanceResults(query, entries) {
+  const results = document.getElementById('conc-results');
+  results.innerHTML = '';
+  let anyResults = false;
 
   CORPORA.forEach(c => {
     const panel = document.createElement('div');
     panel.className = 'conc-corpus-panel';
-
-    const corpusEntries = entries ? entries[c.key] : [];
-    const count = corpusEntries ? corpusEntries.length : 0;
+    const corpusEntries = entries[c.key] || [];
+    const count = corpusEntries.length;
+    if (count > 0) anyResults = true;
 
     panel.innerHTML = `
       <div class="conc-corpus-header ${c.key}">
         <span>${c.label}</span>
-        <span>${count} match${count !== 1 ? 'es' : ''}</span>
+        <span class="conc-count-badge">${count} match${count !== 1 ? 'es' : ''}</span>
       </div>`;
 
-    if (!corpusEntries || corpusEntries.length === 0) {
-      panel.innerHTML += `<div class="conc-empty">No concordance data available for "${query}" in this corpus.</div>`;
+    if (count === 0) {
+      panel.innerHTML += `<div class="conc-empty">No matches for "${query}" in this corpus.</div>`;
     } else {
       corpusEntries.forEach(entry => {
         const div = document.createElement('div');
@@ -1063,15 +1473,14 @@ function searchConcordance() {
         panel.appendChild(div);
       });
     }
-
     results.appendChild(panel);
   });
 
-  if (!entries) {
+  if (!anyResults) {
     results.innerHTML = `<div class="card" style="grid-column:1/-1">
       <p style="color:var(--muted);font-size:.88rem">
-        No pre-computed concordance for "<strong>${query}</strong>".
-        Pre-computed data is available for: ${Object.keys(CONCORDANCE).join(', ')}.
+        No matches for "<strong>${query}</strong>" in any corpus.
+        Pre-computed concordances are available for: ${Object.keys(CONCORDANCE).join(', ')}.
       </p>
     </div>`;
   }
@@ -1083,6 +1492,7 @@ loadData().then(() => {
   buildOverview();
   buildFrequencies();
   buildComparison();
+  buildThemes();
   showDivergence('hca');
   buildScatterPlot();
   buildConcordance();

@@ -62,6 +62,64 @@ CORPUS_CONFIGS = [
     },
 ]
 
+# Thematic word groups for the Themes tab
+THEME_GROUPS = [
+    {
+        'name': 'Royalty & Power',
+        'icon': '♔',
+        'words': ['king', 'queen', 'prince', 'princess', 'castle', 'throne',
+                  'crown', 'kingdom', 'royal', 'palace', 'emperor', 'majesty'],
+    },
+    {
+        'name': 'Family & Kinship',
+        'icon': '👨‍👩‍👧',
+        'words': ['father', 'mother', 'son', 'daughter', 'brother', 'sister',
+                  'child', 'wife', 'husband', 'children', 'widow', 'stepmother'],
+    },
+    {
+        'name': 'Magic & Supernatural',
+        'icon': '✨',
+        'words': ['witch', 'magic', 'spell', 'fairy', 'enchanted', 'dragon',
+                  'ghost', 'spirit', 'wizard', 'wicked', 'curse', 'charm',
+                  'sorcerer', 'mysterious', 'supernatural'],
+    },
+    {
+        'name': 'Animals',
+        'icon': '🦊',
+        'words': ['horse', 'bird', 'wolf', 'bear', 'fox', 'dog', 'cat',
+                  'fish', 'snake', 'eagle', 'deer', 'lion', 'duck', 'swan',
+                  'rabbit', 'raven', 'crow'],
+    },
+    {
+        'name': 'Nature & Elements',
+        'icon': '🌿',
+        'words': ['water', 'sea', 'river', 'mountain', 'forest', 'tree',
+                  'flower', 'wind', 'sun', 'moon', 'fire', 'earth', 'snow',
+                  'ice', 'rain', 'sky', 'wood', 'stone', 'lake', 'field'],
+    },
+    {
+        'name': 'Death & Danger',
+        'icon': '⚔️',
+        'words': ['death', 'dead', 'kill', 'blood', 'evil', 'darkness',
+                  'afraid', 'danger', 'sword', 'war', 'enemy', 'wicked',
+                  'cruel', 'poison', 'die', 'wound'],
+    },
+    {
+        'name': 'Love & Beauty',
+        'icon': '❤️',
+        'words': ['love', 'beautiful', 'heart', 'kiss', 'marry', 'bride',
+                  'wedding', 'lovely', 'fair', 'handsome', 'beloved',
+                  'marriage', 'joy', 'happy'],
+    },
+    {
+        'name': 'Journey & Quest',
+        'icon': '🗺️',
+        'words': ['journey', 'road', 'travel', 'seek', 'find', 'search',
+                  'quest', 'path', 'walk', 'return', 'arrive', 'set',
+                  'home', 'far', 'land', 'world'],
+    },
+]
+
 
 def strip_gutenberg(text):
     """Remove Project Gutenberg header and footer."""
@@ -90,11 +148,8 @@ def strip_gutenberg(text):
 
 def clean_text(text):
     """Strip formatting artifacts."""
-    # Remove [Illustration...] tags
     text = re.sub(r'\[Illustration[^\]]*\]', ' ', text, flags=re.IGNORECASE)
-    # Remove lines that look like chapter/section headers (all caps)
     text = re.sub(r'\n[A-Z][A-Z\s\-\',\.]+\n', '\n', text)
-    # Collapse whitespace
     text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
@@ -109,35 +164,27 @@ def filter_stopwords(tokens):
     return [t for t in tokens if t not in STOPWORDS]
 
 
-def get_concordance(tokens, keyword, window=8, max_results=50):
-    """Return keyword-in-context concordance lines."""
-    results = []
-    kw = keyword.lower()
-    for i, tok in enumerate(tokens):
-        if tok == kw:
-            left_start = max(0, i - window)
-            right_end = min(len(tokens), i + window + 1)
-            left = ' '.join(tokens[left_start:i])
-            right = ' '.join(tokens[i + 1:right_end])
-            results.append({'left': left, 'keyword': tok, 'right': right})
-            if len(results) >= max_results:
-                break
-    return results
-
-
 def extract_sentences(text):
-    """Split text into sentences for concordance context."""
-    sentences = re.split(r'(?<=[.!?])\s+', text)
-    return [s.strip() for s in sentences if len(s.strip()) > 20]
+    """Split text into clean sentences for concordance search."""
+    # Split on sentence-ending punctuation
+    raw = re.split(r'(?<=[.!?])\s+', text)
+    sentences = []
+    for s in raw:
+        s = s.strip()
+        # Clean up the sentence
+        s = re.sub(r'\s+', ' ', s)
+        # Only keep sentences of reasonable length
+        if 25 <= len(s) <= 400:
+            sentences.append(s)
+    return sentences
 
 
-def sentence_concordance(sentences, keyword, max_results=30):
-    """Find sentences containing keyword."""
+def sentence_concordance(sentences, keyword, max_results=25):
+    """Find sentences containing keyword with highlight markup."""
     kw = keyword.lower()
     results = []
     for sent in sentences:
         if kw in sent.lower():
-            # Highlight the keyword
             highlighted = re.sub(
                 r'\b' + re.escape(keyword) + r'\b',
                 f'<mark>{keyword}</mark>',
@@ -165,7 +212,7 @@ def process_corpus(config):
 
     top_words = [
         {'word': w, 'count': c, 'freq': round(c / total * 1000, 4)}
-        for w, c in freq.most_common(200)
+        for w, c in freq.most_common(500)
     ]
 
     return {
@@ -188,7 +235,6 @@ def compute_shared_terms(corpora, top_n=100):
     all_freqs = [c['freq'] for c in corpora]
     all_words = set.intersection(*[set(f.keys()) for f in all_freqs])
 
-    # Score by minimum frequency (present meaningfully in all)
     scored = []
     for w in all_words:
         counts = [f[w] for f in all_freqs]
@@ -208,13 +254,40 @@ def compute_shared_terms(corpora, top_n=100):
     return scored[:top_n]
 
 
+def compute_themes(corpora):
+    """Compute per-theme normalized frequency scores for each corpus."""
+    results = []
+    for group in THEME_GROUPS:
+        group_data = {
+            'name': group['name'],
+            'icon': group['icon'],
+            'words': group['words'],
+            'scores': {},
+            'word_scores': {},  # individual word breakdown
+        }
+        for corpus in corpora:
+            total = corpus['total_tokens']
+            freq = corpus['freq']
+            # Sum normalized frequencies for all theme words
+            word_scores = {}
+            for w in group['words']:
+                count = freq.get(w, 0)
+                word_scores[w] = round(count / total * 10000, 4)
+            group_data['scores'][corpus['key']] = round(
+                sum(word_scores.values()), 4
+            )
+            group_data['word_scores'][corpus['key']] = word_scores
+        results.append(group_data)
+    return results
+
+
 def build_concordance_data(corpora, keywords):
-    """Build concordance entries for a set of keywords."""
+    """Build sentence-level concordance entries for a set of keywords."""
     result = {}
     for kw in keywords:
         result[kw] = {}
         for corpus in corpora:
-            entries = sentence_concordance(corpus['sentences'], kw, max_results=20)
+            entries = sentence_concordance(corpus['sentences'], kw, max_results=25)
             result[kw][corpus['key']] = entries
     return result
 
@@ -228,13 +301,18 @@ def main():
         print(f"  Processing {config['label']}...")
         data = process_corpus(config)
         corpora.append(data)
-        print(f"    {data['total_tokens']:,} tokens, {data['unique_tokens']:,} unique")
+        print(f"    {data['total_tokens']:,} tokens, {data['unique_tokens']:,} unique, "
+              f"{len(data['sentences']):,} sentences")
 
     print("Computing shared terms...")
     shared = compute_shared_terms(corpora)
     print(f"  Found {len(shared)} shared terms")
 
-    # Build main corpus stats JSON
+    print("Computing themes...")
+    themes = compute_themes(corpora)
+    print(f"  Computed {len(themes)} thematic groups")
+
+    # ── corpus stats JSON (top 500 words for client-side theme lookup) ──
     corpus_stats = []
     for c in corpora:
         corpus_stats.append({
@@ -244,7 +322,7 @@ def main():
             'color': c['color'],
             'total_tokens': c['total_tokens'],
             'unique_tokens': c['unique_tokens'],
-            'top_words': c['top_words'],
+            'top_words': c['top_words'],  # now 500 words
         })
 
     with open('data/corpora.json', 'w') as f:
@@ -255,34 +333,59 @@ def main():
         json.dump(shared, f, separators=(',', ':'))
     print("  Wrote data/shared.json")
 
-    # Build concordance for top 40 shared terms
-    print("Building concordances...")
-    top_shared_words = [s['word'] for s in shared[:40]]
+    with open('data/themes.json', 'w') as f:
+        json.dump(themes, f, separators=(',', ':'))
+    print("  Wrote data/themes.json")
+
+    # ── sentences for full client-side concordance ──
+    print("Exporting sentences for full concordance...")
+    sentences_data = {}
+    for c in corpora:
+        # Limit to 3500 sentences per corpus to keep file size reasonable
+        sentences_data[c['key']] = c['sentences'][:3500]
+        print(f"  {c['key']}: {len(sentences_data[c['key']]):,} sentences")
+    with open('data/sentences.json', 'w') as f:
+        json.dump(sentences_data, f, separators=(',', ':'))
+    print("  Wrote data/sentences.json")
+
+    # ── pre-computed concordance for top 60 shared terms ──
+    print("Building pre-computed concordances (top 60 shared terms)...")
+    top_shared_words = [s['word'] for s in shared[:60]]
     concordance = build_concordance_data(corpora, top_shared_words)
     with open('data/concordance.json', 'w') as f:
         json.dump(concordance, f, separators=(',', ':'))
     print("  Wrote data/concordance.json")
 
-    # Also build a frequency comparison table (top 50 of each, union)
+    # ── frequency comparison table (top 60 per corpus, union) ──
     all_top = set()
     for c in corpora:
-        all_top.update(w['word'] for w in c['top_words'][:50])
+        all_top.update(w['word'] for w in c['top_words'][:60])
 
     freq_table = []
     for word in sorted(all_top):
         row = {'word': word}
         for c in corpora:
-            row[c['key']] = c['freq'].get(word, 0)
+            # Look up count from top_words list
+            entry = next((w for w in c['top_words'] if w['word'] == word), None)
+            row[c['key']] = entry['count'] if entry else 0
             total = c['total_tokens']
-            row[c['key'] + '_norm'] = round(c['freq'].get(word, 0) / total * 10000, 4)
+            row[c['key'] + '_norm'] = round(
+                (entry['count'] if entry else 0) / total * 10000, 4
+            )
         freq_table.append(row)
-    freq_table.sort(key=lambda x: sum(x.get(c['key'], 0) for c in corpora), reverse=True)
+    freq_table.sort(
+        key=lambda x: sum(x.get(c['key'], 0) for c in corpora), reverse=True
+    )
 
     with open('data/freq_table.json', 'w') as f:
         json.dump(freq_table, f, separators=(',', ':'))
     print("  Wrote data/freq_table.json")
 
     print("\nDone! Generated files in data/")
+    for fname in ['corpora.json', 'shared.json', 'themes.json',
+                  'sentences.json', 'concordance.json', 'freq_table.json']:
+        size = os.path.getsize(f'data/{fname}')
+        print(f"  data/{fname}: {size / 1024:.1f} KB")
 
 
 if __name__ == '__main__':
