@@ -779,7 +779,7 @@
   <p class="section-desc">
     Summary statistics for each collection after stripping Gutenberg headers, removing stopwords,
     and filtering to content words. HCA is roughly 3× larger than the other two; all frequency
-    comparisons use per-10,000 token normalization.
+    comparisons use per-10,000 word normalization.
   </p>
 
   <div class="stats-grid" id="stats-grid"></div>
@@ -788,14 +788,14 @@
 
   <div class="card">
     <div class="card-title">Vocabulary Size Comparison</div>
-    <div class="card-subtitle">Solid bars = total content-word tokens; outlined = unique vocabulary</div>
+    <div class="card-subtitle">Solid bars = total content words; outlined = unique vocabulary</div>
     <div class="chart-wrap" style="max-height:300px">
       <canvas id="overview-bar-chart"></canvas>
     </div>
   </div>
 
   <div class="card">
-    <div class="card-title">Top 30 Shared Terms — Normalized Frequency (per 10,000 tokens)</div>
+    <div class="card-title">Top 30 Shared Terms — Normalized Frequency (per 10,000 words)</div>
     <div class="card-subtitle">Words that appear in all three collections; bars allow direct cross-corpus comparison</div>
     <div class="chart-wrap" style="max-height:440px">
       <canvas id="shared-bar-chart"></canvas>
@@ -808,11 +808,11 @@
   <h2 class="section-title">Word Frequency Distributions</h2>
   <p class="section-desc">
     Top 30 most frequent content words per collection. Toggle between raw counts and normalized
-    frequency (per 10,000 tokens) to account for the size difference between corpora.
+    frequency (per 10,000 words) to account for the size difference between corpora.
   </p>
   <div class="filter-row">
     <button class="filter-btn neutral active" id="freq-mode-raw" onclick="setFreqMode('raw')">Raw Counts</button>
-    <button class="filter-btn neutral" id="freq-mode-norm" onclick="setFreqMode('norm')">Per 10k Tokens</button>
+    <button class="filter-btn neutral" id="freq-mode-norm" onclick="setFreqMode('norm')">Per 10k Words</button>
   </div>
   <div class="charts-grid" id="freq-charts-grid"></div>
 
@@ -838,7 +838,7 @@
   </p>
 
   <div class="card">
-    <div class="card-title">Top 25 Shared Terms — Grouped Bar Chart (per 10,000 tokens)</div>
+    <div class="card-title">Top 25 Shared Terms — Grouped Bar Chart (per 10,000 words)</div>
     <div class="chart-wrap" style="max-height:480px">
       <canvas id="grouped-bar-chart"></canvas>
     </div>
@@ -890,7 +890,7 @@
   </p>
 
   <div class="card">
-    <div class="card-title">Theme Intensity by Corpus (per 10,000 tokens, summed)</div>
+    <div class="card-title">Theme Intensity by Corpus (per 10,000 words, summed)</div>
     <div class="chart-wrap" style="max-height:460px">
       <canvas id="theme-bar-chart"></canvas>
     </div>
@@ -1040,7 +1040,7 @@ function buildOverview() {
       <div class="stat-card ${c.key}">
         <div class="stat-corpus" style="color:${c.color}">${c.label}</div>
         <div class="stat-row">
-          <span class="stat-label">Total content-word tokens</span>
+          <span class="stat-label">Total content words</span>
           <span class="stat-value">${c.total_tokens.toLocaleString()}</span>
         </div>
         <div class="stat-row">
@@ -1063,7 +1063,7 @@ function buildOverview() {
   const insights = [
     {
       label: 'Lexical Diversity',
-      text: `Russian Tales has the highest type-token ratio (${(ru.unique_tokens/ru.total_tokens*100).toFixed(1)}% vs HCA ${(hca.unique_tokens/hca.total_tokens*100).toFixed(1)}%), suggesting more varied vocabulary per unit of text.`,
+      text: `Russian Tales has the highest lexical diversity (${(ru.unique_tokens/ru.total_tokens*100).toFixed(1)}% vs HCA ${(hca.unique_tokens/hca.total_tokens*100).toFixed(1)}%), suggesting more varied vocabulary per unit of text.`,
     },
     {
       label: 'Scale',
@@ -1090,7 +1090,7 @@ function buildOverview() {
       labels: CORPORA.map(c => c.label),
       datasets: [
         {
-          label: 'Total Tokens',
+          label: 'Total Words',
           data: CORPORA.map(c => c.total_tokens),
           backgroundColor: CORPORA.map(c => c.color + 'cc'),
           borderColor: CORPORA.map(c => c.color),
@@ -1137,7 +1137,7 @@ function buildOverview() {
         x: { grid: { display: false }, ticks: { maxRotation: 45 } },
         y: {
           grid: { color: '#2e2519' },
-          title: { display: true, text: 'Freq per 10k tokens' }
+          title: { display: true, text: 'Freq per 10k words' }
         }
       }
     }
@@ -1159,7 +1159,7 @@ function updateFreqChart(c) {
   if (!chart) return;
   const top30 = c.top_words.slice(0, 30);
   chart.data.datasets[0].data = top30.map(w => freqMode === 'raw' ? w.count : w.freq * 10);
-  chart.options.scales.x.title.text = freqMode === 'raw' ? 'Count' : 'Per 10k tokens';
+  chart.options.scales.x.title.text = freqMode === 'raw' ? 'Count' : 'Per 10k words';
   chart.update();
 }
 
@@ -1287,7 +1287,7 @@ function buildComparison() {
         x: { grid: { display: false }, ticks: { maxRotation: 30 } },
         y: {
           grid: { color: '#2e2519' },
-          title: { display: true, text: 'Freq per 10k tokens' }
+          title: { display: true, text: 'Freq per 10k words' }
         }
       }
     }
@@ -1401,7 +1401,7 @@ function buildThemes() {
       scales: {
         x: {
           grid: { color: '#2e2519' },
-          title: { display: true, text: 'Summed freq per 10k tokens' }
+          title: { display: true, text: 'Summed freq per 10k words' }
         },
         y: { grid: { display: false }, ticks: { font: { size: 12 } } }
       }
