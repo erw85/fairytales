@@ -43,7 +43,6 @@
       padding: 3.5rem 2rem 3rem;
       text-align: center;
       position: relative;
-      overflow: hidden;
     }
     header::before {
       content: '';
@@ -54,6 +53,20 @@
         radial-gradient(circle at 80% 50%, rgba(100,60,80,.05) 0%, transparent 50%);
       pointer-events: none;
     }
+    /* ─── HEADER FAIRIES ─── */
+    .header-fairy {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 130px;
+      width: auto;
+      opacity: 0.72;
+      pointer-events: none;
+    }
+    .fairy-left  { left: 1.75rem; }
+    .fairy-right { right: 1.75rem; transform: translateY(-50%) scaleX(-1); }
+    @media (max-width: 780px) { .header-fairy { display: none; } }
+
     .header-ornament {
       font-family: 'Cinzel', serif;
       color: var(--gold);
@@ -599,6 +612,107 @@
 </div>
 
 <header>
+
+  <!-- Fairy facing right (left side) -->
+  <svg class="header-fairy fairy-left" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"
+       fill="none" stroke="#c9a040" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- upper back wing (large, sweeping left) -->
+    <path d="M 52,44 C 44,34 24,16 7,11 C 0,9 0,20 8,26 C 18,32 38,39 52,44"/>
+    <path d="M 52,44 C 40,34 22,22 10,17" stroke-width="0.8" opacity="0.65"/>
+    <path d="M 52,44 C 38,42 22,42 12,46" stroke-width="0.8" opacity="0.65"/>
+    <!-- lower back wing (medium) -->
+    <path d="M 52,54 C 42,53 24,57 16,70 C 12,78 20,81 52,54"/>
+    <path d="M 52,54 C 40,57 26,65 20,74" stroke-width="0.8" opacity="0.65"/>
+    <!-- upper forward wing (medium, right) -->
+    <path d="M 60,44 C 68,34 83,22 95,20 C 101,19 99,29 91,33 C 80,38 66,42 60,44"/>
+    <path d="M 60,44 C 70,37 84,28 93,24" stroke-width="0.8" opacity="0.65"/>
+    <!-- lower forward wing (small) -->
+    <path d="M 60,54 C 68,51 81,56 83,67 C 85,76 75,76 60,54"/>
+    <!-- head -->
+    <ellipse cx="67" cy="16" rx="10" ry="11"/>
+    <!-- hair flowing back/left -->
+    <path d="M 59,9 C 51,3 36,6 28,16 C 23,23 25,33 32,37"/>
+    <path d="M 63,8 C 61,2 67,0 71,6"/>
+    <path d="M 73,8 C 77,5 77,11 74,15" stroke-width="1"/>
+    <!-- right-profile face details -->
+    <path d="M 74,13 C 78,14 78,20 74,21" stroke-width="0.9"/>
+    <circle cx="75" cy="12" r="1.5" fill="#c9a040" stroke="none"/>
+    <!-- neck -->
+    <path d="M 67,27 C 65,30 63,33 62,36"/>
+    <!-- bodice -->
+    <path d="M 55,38 C 59,35 63,36 67,38 C 71,41 72,49 70,57"/>
+    <path d="M 55,38 C 51,40 49,49 49,57"/>
+    <!-- skirt -->
+    <path d="M 49,61 C 43,69 39,80 41,89 C 43,96 50,98 54,94"/>
+    <path d="M 70,59 C 77,67 79,79 77,89 C 75,96 67,98 63,94"/>
+    <path d="M 54,94 Q 62,102 63,94"/>
+    <path d="M 41,89 C 37,93 35,97 37,99"/>
+    <path d="M 77,89 C 81,93 83,97 81,99"/>
+    <!-- right arm + wand -->
+    <path d="M 68,41 C 75,35 82,28 88,22"/>
+    <line x1="88" y1="22" x2="94" y2="15"/>
+    <!-- 4-pointed sparkle star -->
+    <path d="M 94,11 L 95.5,14 L 99,15 L 95.5,16 L 94,19 L 92.5,16 L 89,15 L 92.5,14 Z"
+          fill="#c9a040" stroke="#c9a040" stroke-width="0.5"/>
+    <!-- sparkle dots -->
+    <circle cx="86" cy="11" r="1"   fill="#c9a040" stroke="none"/>
+    <circle cx="99" cy="10" r="0.8" fill="#c9a040" stroke="none"/>
+    <circle cx="88" cy="6"  r="0.7" fill="#c9a040" stroke="none"/>
+    <!-- left arm graceful, sweeping back -->
+    <path d="M 55,41 C 49,47 45,54 43,60"/>
+    <path d="M 43,60 C 41,62 39,61 37,59"/>
+  </svg>
+
+  <!-- Fairy facing left (right side) — CSS mirror of the left fairy -->
+  <svg class="header-fairy fairy-right" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg"
+       fill="none" stroke="#c9a040" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+    <!-- upper back wing (large, sweeping left) -->
+    <path d="M 52,44 C 44,34 24,16 7,11 C 0,9 0,20 8,26 C 18,32 38,39 52,44"/>
+    <path d="M 52,44 C 40,34 22,22 10,17" stroke-width="0.8" opacity="0.65"/>
+    <path d="M 52,44 C 38,42 22,42 12,46" stroke-width="0.8" opacity="0.65"/>
+    <!-- lower back wing (medium) -->
+    <path d="M 52,54 C 42,53 24,57 16,70 C 12,78 20,81 52,54"/>
+    <path d="M 52,54 C 40,57 26,65 20,74" stroke-width="0.8" opacity="0.65"/>
+    <!-- upper forward wing (medium, right) -->
+    <path d="M 60,44 C 68,34 83,22 95,20 C 101,19 99,29 91,33 C 80,38 66,42 60,44"/>
+    <path d="M 60,44 C 70,37 84,28 93,24" stroke-width="0.8" opacity="0.65"/>
+    <!-- lower forward wing (small) -->
+    <path d="M 60,54 C 68,51 81,56 83,67 C 85,76 75,76 60,54"/>
+    <!-- head -->
+    <ellipse cx="67" cy="16" rx="10" ry="11"/>
+    <!-- hair flowing back/left -->
+    <path d="M 59,9 C 51,3 36,6 28,16 C 23,23 25,33 32,37"/>
+    <path d="M 63,8 C 61,2 67,0 71,6"/>
+    <path d="M 73,8 C 77,5 77,11 74,15" stroke-width="1"/>
+    <!-- right-profile face details -->
+    <path d="M 74,13 C 78,14 78,20 74,21" stroke-width="0.9"/>
+    <circle cx="75" cy="12" r="1.5" fill="#c9a040" stroke="none"/>
+    <!-- neck -->
+    <path d="M 67,27 C 65,30 63,33 62,36"/>
+    <!-- bodice -->
+    <path d="M 55,38 C 59,35 63,36 67,38 C 71,41 72,49 70,57"/>
+    <path d="M 55,38 C 51,40 49,49 49,57"/>
+    <!-- skirt -->
+    <path d="M 49,61 C 43,69 39,80 41,89 C 43,96 50,98 54,94"/>
+    <path d="M 70,59 C 77,67 79,79 77,89 C 75,96 67,98 63,94"/>
+    <path d="M 54,94 Q 62,102 63,94"/>
+    <path d="M 41,89 C 37,93 35,97 37,99"/>
+    <path d="M 77,89 C 81,93 83,97 81,99"/>
+    <!-- right arm + wand -->
+    <path d="M 68,41 C 75,35 82,28 88,22"/>
+    <line x1="88" y1="22" x2="94" y2="15"/>
+    <!-- 4-pointed sparkle star -->
+    <path d="M 94,11 L 95.5,14 L 99,15 L 95.5,16 L 94,19 L 92.5,16 L 89,15 L 92.5,14 Z"
+          fill="#c9a040" stroke="#c9a040" stroke-width="0.5"/>
+    <!-- sparkle dots -->
+    <circle cx="86" cy="11" r="1"   fill="#c9a040" stroke="none"/>
+    <circle cx="99" cy="10" r="0.8" fill="#c9a040" stroke="none"/>
+    <circle cx="88" cy="6"  r="0.7" fill="#c9a040" stroke="none"/>
+    <!-- left arm graceful, sweeping back -->
+    <path d="M 55,41 C 49,47 45,54 43,60"/>
+    <path d="M 43,60 C 41,62 39,61 37,59"/>
+  </svg>
+
   <div class="header-ornament">✦ &nbsp; Textual Analysis &nbsp; ✦</div>
   <h1>Fairy Tale Corpus Explorer</h1>
   <div class="header-rule"><span class="header-rule-gem">❧</span></div>
