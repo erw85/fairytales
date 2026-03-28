@@ -266,15 +266,15 @@
       transition: all .2s;
       background: transparent;
     }
-    .filter-btn.active { color: var(--bg); }
     .filter-btn.hca     { border-color: var(--hca);     color: var(--hca); }
     .filter-btn.grimms  { border-color: var(--grimms);  color: var(--grimms); }
     .filter-btn.russian { border-color: var(--russian); color: var(--russian); }
-    .filter-btn.hca.active     { background: var(--hca); }
-    .filter-btn.grimms.active  { background: var(--grimms); }
-    .filter-btn.russian.active { background: var(--russian); }
+    /* active: higher specificity (3 classes) beats the 2-class color rules above */
+    .filter-btn.hca.active     { background: var(--hca);  color: var(--bg); }
+    .filter-btn.grimms.active  { background: var(--grimms); color: var(--bg); }
+    .filter-btn.russian.active { background: #e06060; border-color: #e06060; color: var(--bg); }
     .filter-btn.neutral { border-color: var(--muted); color: var(--muted); }
-    .filter-btn.neutral.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
+    .filter-btn.neutral.active { background: var(--gold-lt); color: var(--bg); border-color: var(--gold-lt); }
 
     /* ─── COMPARISON TABLE ─── */
     .table-controls {
