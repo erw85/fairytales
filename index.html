@@ -5,20 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fairy Tale Corpus Explorer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cinzel:wght@400;600&family=IM+Fell+English:ital@0;1&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
   <style>
     :root {
-      --hca:     #4e79a7;
-      --grimms:  #f28e2b;
-      --russian: #e15759;
-      --bg:      #faf9f6;
-      --surface: #ffffff;
-      --border:  #e8e4dc;
-      --text:    #2c2c2c;
-      --muted:   #6b6b6b;
-      --radius:  10px;
+      --hca:     #6aaecc;
+      --grimms:  #c98c22;
+      --russian: #c44848;
+      --bg:      #0c0a08;
+      --surface: #151210;
+      --surface2:#1e1a14;
+      --border:  #2e2519;
+      --text:    #e0cfb8;
+      --muted:   #7a6a52;
+      --gold:    #a07828;
+      --gold-lt: #c9a040;
+      --radius:  8px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -32,48 +35,96 @@
 
     /* ─── HEADER ─── */
     header {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      color: #fff;
-      padding: 3rem 2rem 2.5rem;
+      background:
+        radial-gradient(ellipse at 50% 0%, #1c1030 0%, transparent 70%),
+        linear-gradient(180deg, #0a0608 0%, #120c10 60%, #0c0a08 100%);
+      border-bottom: 1px solid #3a2a1a;
+      color: var(--text);
+      padding: 3.5rem 2rem 3rem;
       text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(160,120,40,.04) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(100,60,80,.05) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .header-ornament {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      font-size: .75rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      margin-bottom: 1.1rem;
+      opacity: .7;
     }
     header h1 {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.8rem, 4vw, 3rem);
-      letter-spacing: -0.02em;
-      margin-bottom: .5rem;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+      letter-spacing: .04em;
+      color: var(--gold-lt);
+      text-shadow: 0 0 40px rgba(180,140,50,.25);
+      margin-bottom: .8rem;
+      line-height: 1.25;
     }
     header p {
-      opacity: .75;
-      font-size: .95rem;
-      max-width: 640px;
-      margin: 0 auto;
-      line-height: 1.6;
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      color: var(--muted);
+      font-size: 1rem;
+      max-width: 600px;
+      margin: 0 auto .1rem;
+      line-height: 1.7;
     }
+    .header-rule {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: .75rem;
+      margin: 1.25rem auto .1rem;
+      max-width: 320px;
+    }
+    .header-rule::before,
+    .header-rule::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold));
+    }
+    .header-rule::after { background: linear-gradient(to left, transparent, var(--gold)); }
+    .header-rule-gem { color: var(--gold); font-size: .8rem; }
     .corpus-badges {
       display: flex;
       justify-content: center;
-      gap: .75rem;
-      margin-top: 1.25rem;
+      gap: .65rem;
+      margin-top: 1.2rem;
       flex-wrap: wrap;
     }
     .badge {
-      padding: .35rem .9rem;
-      border-radius: 20px;
-      font-size: .8rem;
+      padding: .3rem .9rem;
+      border-radius: 3px;
+      font-family: 'Cinzel', serif;
+      font-size: .68rem;
       font-weight: 600;
-      letter-spacing: .03em;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border: 1px solid;
     }
-    .badge-hca     { background: var(--hca);     color: #fff; }
-    .badge-grimms  { background: var(--grimms);  color: #fff; }
-    .badge-russian { background: var(--russian); color: #fff; }
+    .badge-hca     { color: var(--hca);     border-color: var(--hca);     background: rgba(106,174,204,.1); }
+    .badge-grimms  { color: var(--grimms);  border-color: var(--grimms);  background: rgba(201,140,34,.1); }
+    .badge-russian { color: var(--russian); border-color: var(--russian); background: rgba(196,72,72,.1); }
 
     /* ─── NAV TABS ─── */
     nav.tabs {
       position: sticky;
       top: 0;
       z-index: 100;
-      background: var(--surface);
+      background: #0f0d0b;
       border-bottom: 1px solid var(--border);
       display: flex;
       gap: 0;
@@ -86,19 +137,21 @@
       padding: .85rem 1.4rem;
       border: none;
       background: none;
-      font-size: .85rem;
-      font-weight: 500;
+      font-family: 'Cinzel', serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
       color: var(--muted);
       cursor: pointer;
-      border-bottom: 3px solid transparent;
+      border-bottom: 2px solid transparent;
       transition: color .2s, border-color .2s;
       white-space: nowrap;
     }
     .tab-btn:hover { color: var(--text); }
     .tab-btn.active {
-      color: #1a1a2e;
-      border-bottom-color: #1a1a2e;
-      font-weight: 600;
+      color: var(--gold-lt);
+      border-bottom-color: var(--gold);
     }
 
     /* ─── LAYOUT ─── */
@@ -108,15 +161,25 @@
     .section.active { display: block; }
 
     .section-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.6rem;
-      margin-bottom: .4rem;
+      font-family: 'Cinzel', serif;
+      font-size: 1.35rem;
+      letter-spacing: .04em;
+      color: var(--gold-lt);
+      margin-bottom: .5rem;
+    }
+    .section-title::after {
+      content: '';
+      display: block;
+      height: 1px;
+      width: 60px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin-top: .4rem;
     }
     .section-desc {
       color: var(--muted);
-      font-size: .9rem;
+      font-size: .88rem;
       margin-bottom: 1.75rem;
-      line-height: 1.6;
+      line-height: 1.7;
       max-width: 760px;
     }
 
@@ -127,18 +190,23 @@
       border-radius: var(--radius);
       padding: 1.5rem;
       margin-bottom: 1.5rem;
+      box-shadow: 0 2px 16px rgba(0,0,0,.4);
     }
     .card-title {
+      font-family: 'Cinzel', serif;
       font-weight: 600;
-      font-size: .95rem;
+      font-size: .8rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
       margin-bottom: 1rem;
-      color: var(--text);
+      color: var(--gold-lt);
     }
     .card-subtitle {
       font-size: .8rem;
       color: var(--muted);
       margin-top: -.5rem;
       margin-bottom: 1rem;
+      font-style: italic;
     }
 
     /* ─── STATS ROW ─── */
@@ -153,23 +221,26 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.25rem 1.5rem;
-      border-left: 5px solid transparent;
+      border-left: 4px solid transparent;
+      box-shadow: 0 2px 12px rgba(0,0,0,.35);
     }
     .stat-card.hca     { border-left-color: var(--hca); }
     .stat-card.grimms  { border-left-color: var(--grimms); }
     .stat-card.russian { border-left-color: var(--russian); }
-    .stat-corpus { font-weight: 600; font-size: .95rem; margin-bottom: .75rem; }
+    .stat-corpus {
+      font-family: 'Cinzel', serif;
+      font-weight: 600;
+      font-size: .82rem;
+      letter-spacing: .05em;
+      margin-bottom: .75rem;
+    }
     .stat-row { display: flex; justify-content: space-between; margin-bottom: .3rem; }
-    .stat-label { color: var(--muted); font-size: .82rem; }
-    .stat-value { font-weight: 600; font-size: .88rem; }
+    .stat-label { color: var(--muted); font-size: .8rem; }
+    .stat-value { font-weight: 600; font-size: .86rem; color: var(--text); }
 
     /* ─── CHARTS ─── */
-    .chart-wrap {
-      position: relative;
-      width: 100%;
-    }
+    .chart-wrap { position: relative; width: 100%; }
     .chart-wrap canvas { width: 100% !important; }
-
     .charts-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -179,25 +250,27 @@
     /* ─── FILTER BUTTONS ─── */
     .filter-row { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; align-items: center; }
     .filter-btn {
-      padding: .35rem .85rem;
-      border-radius: 20px;
-      border: 2px solid transparent;
-      font-size: .8rem;
+      padding: .3rem .8rem;
+      border-radius: 3px;
+      border: 1px solid transparent;
+      font-family: 'Cinzel', serif;
+      font-size: .68rem;
       font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
       cursor: pointer;
       transition: all .2s;
-      font-family: inherit;
       background: transparent;
     }
-    .filter-btn.active { color: #fff; }
+    .filter-btn.active { color: var(--bg); }
     .filter-btn.hca     { border-color: var(--hca);     color: var(--hca); }
     .filter-btn.grimms  { border-color: var(--grimms);  color: var(--grimms); }
     .filter-btn.russian { border-color: var(--russian); color: var(--russian); }
     .filter-btn.hca.active     { background: var(--hca); }
     .filter-btn.grimms.active  { background: var(--grimms); }
     .filter-btn.russian.active { background: var(--russian); }
-    .filter-btn.neutral { border-color: #888; color: #555; }
-    .filter-btn.neutral.active { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .filter-btn.neutral { border-color: var(--muted); color: var(--muted); }
+    .filter-btn.neutral.active { background: var(--gold); color: var(--bg); border-color: var(--gold); }
 
     /* ─── COMPARISON TABLE ─── */
     .table-controls {
@@ -211,11 +284,13 @@
     .table-controls input[type=text] {
       padding: .35rem .65rem;
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: .82rem;
       font-family: inherit;
-      background: var(--surface);
+      background: var(--surface2);
+      color: var(--text);
     }
+    .table-controls select option { background: var(--surface2); }
     .table-controls input[type=text] { flex: 1; min-width: 130px; }
     .table-wrap { overflow-x: auto; max-height: 520px; overflow-y: auto; }
     table.comparison {
@@ -224,18 +299,24 @@
       font-size: .84rem;
     }
     table.comparison th {
-      background: #f4f1eb;
+      background: var(--surface2);
       padding: .6rem .9rem;
       text-align: left;
+      font-family: 'Cinzel', serif;
+      font-size: .68rem;
       font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      color: var(--gold-lt);
       position: sticky;
       top: 0;
       z-index: 1;
+      border-bottom: 1px solid var(--border);
     }
-    table.comparison td { padding: .5rem .9rem; border-bottom: 1px solid #f0ede5; }
-    table.comparison tr:hover td { background: #faf9f6; }
+    table.comparison td { padding: .5rem .9rem; border-bottom: 1px solid var(--border); color: var(--text); }
+    table.comparison tr:hover td { background: var(--surface2); }
     .bar-cell { display: flex; align-items: center; gap: .4rem; }
-    .mini-bar { height: 10px; border-radius: 5px; min-width: 2px; }
+    .mini-bar { height: 8px; border-radius: 2px; min-width: 2px; opacity: .85; }
     .bar-hca     { background: var(--hca); }
     .bar-grimms  { background: var(--grimms); }
     .bar-russian { background: var(--russian); }
@@ -243,17 +324,19 @@
     /* ─── RATIO BADGES ─── */
     .ratio-badge {
       display: inline-block;
-      font-size: .68rem;
+      font-family: 'Cinzel', serif;
+      font-size: .62rem;
       font-weight: 700;
+      letter-spacing: .04em;
       padding: .1rem .45rem;
-      border-radius: 10px;
-      color: #fff;
+      border-radius: 2px;
+      color: var(--bg);
       white-space: nowrap;
     }
     .ratio-hca     { background: var(--hca); }
     .ratio-grimms  { background: var(--grimms); }
     .ratio-russian { background: var(--russian); }
-    .ratio-equal   { background: #888; }
+    .ratio-equal   { background: var(--muted); color: var(--text); }
 
     /* ─── THEMES ─── */
     .theme-selector {
@@ -263,22 +346,23 @@
       margin-bottom: 1.5rem;
     }
     .theme-btn {
-      background: var(--surface);
-      border: 2px solid var(--border);
+      background: var(--surface2);
+      border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: .65rem 1rem;
       cursor: pointer;
       font-family: inherit;
-      font-size: .83rem;
+      font-size: .82rem;
       font-weight: 500;
+      color: var(--text);
       text-align: left;
       transition: all .18s;
       display: flex;
       align-items: center;
       gap: .5rem;
     }
-    .theme-btn:hover { border-color: #999; background: #f7f5ef; }
-    .theme-btn.active { border-color: #1a1a2e; background: #1a1a2e; color: #fff; }
+    .theme-btn:hover { border-color: var(--gold); color: var(--gold-lt); }
+    .theme-btn.active { border-color: var(--gold); background: #1e1608; color: var(--gold-lt); }
     .theme-icon { font-size: 1.1rem; flex-shrink: 0; }
     .theme-breakdown {
       display: grid;
@@ -286,24 +370,26 @@
       gap: .5rem;
     }
     .theme-word-row {
-      background: #f8f6f0;
-      border-radius: 6px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 5px;
       padding: .5rem .75rem;
       font-size: .82rem;
     }
     .theme-word-label { font-weight: 600; margin-bottom: .35rem; color: var(--text); }
     .theme-word-bars { display: flex; flex-direction: column; gap: .25rem; }
     .theme-word-bar-row { display: flex; align-items: center; gap: .4rem; font-size: .74rem; color: var(--muted); }
-    .theme-word-bar-fill { height: 7px; border-radius: 4px; min-width: 2px; }
+    .theme-word-bar-fill { height: 7px; border-radius: 2px; min-width: 2px; opacity: .8; }
 
     /* ─── DIVERGENCE ─── */
     #scatter-svg text { font-family: 'Inter', sans-serif; }
     .bubble-tip {
       position: absolute;
-      background: rgba(20,20,40,.9);
-      color: #fff;
+      background: #1a1208;
+      border: 1px solid var(--gold);
+      color: var(--text);
       padding: .4rem .75rem;
-      border-radius: 6px;
+      border-radius: 4px;
       font-size: .78rem;
       pointer-events: none;
       white-space: nowrap;
@@ -321,11 +407,14 @@
       align-items: flex-end;
     }
     .conc-controls label {
-      font-size: .82rem;
+      font-family: 'Cinzel', serif;
+      font-size: .68rem;
       font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
       margin-bottom: .3rem;
       display: block;
-      color: var(--muted);
+      color: var(--gold);
     }
     .conc-input-wrap { flex: 1; min-width: 220px; }
     .conc-input-wrap input {
@@ -335,34 +424,40 @@
       border-radius: var(--radius);
       font-size: .9rem;
       font-family: inherit;
+      background: var(--surface2);
+      color: var(--text);
     }
-    .conc-input-wrap input:focus { outline: none; border-color: #1a1a2e; }
+    .conc-input-wrap input::placeholder { color: var(--muted); }
+    .conc-input-wrap input:focus { outline: none; border-color: var(--gold); }
     .btn-primary {
       padding: .6rem 1.4rem;
-      background: #1a1a2e;
-      color: #fff;
-      border: none;
+      background: transparent;
+      color: var(--gold-lt);
+      border: 1px solid var(--gold);
       border-radius: var(--radius);
-      font-size: .88rem;
+      font-family: 'Cinzel', serif;
+      font-size: .72rem;
       font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
       cursor: pointer;
-      font-family: inherit;
       white-space: nowrap;
+      transition: all .2s;
     }
-    .btn-primary:hover { background: #0f3460; }
+    .btn-primary:hover { background: var(--gold); color: var(--bg); }
     .suggestions { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .suggestion-btn {
-      padding: .25rem .65rem;
+      padding: .22rem .6rem;
       border: 1px solid var(--border);
-      border-radius: 15px;
+      border-radius: 3px;
       background: none;
-      font-size: .78rem;
+      font-size: .76rem;
       cursor: pointer;
       font-family: inherit;
       transition: all .15s;
-      color: var(--text);
+      color: var(--muted);
     }
-    .suggestion-btn:hover { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+    .suggestion-btn:hover { border-color: var(--gold); color: var(--gold-lt); background: #1a1208; }
     .conc-results-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
@@ -373,12 +468,16 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,.4);
     }
     .conc-corpus-header {
       padding: .6rem 1rem;
-      font-size: .82rem;
+      font-family: 'Cinzel', serif;
+      font-size: .68rem;
       font-weight: 600;
-      color: #fff;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--bg);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -388,38 +487,44 @@
     .conc-corpus-header.russian { background: var(--russian); }
     .conc-entry {
       padding: .65rem 1rem;
-      border-bottom: 1px solid #f0ede5;
+      border-bottom: 1px solid var(--border);
       font-size: .83rem;
-      line-height: 1.6;
+      line-height: 1.65;
       color: var(--text);
     }
     .conc-entry:last-child { border-bottom: none; }
-    .conc-entry mark { background: #fff3cd; border-radius: 2px; padding: 0 2px; font-weight: 600; }
+    .conc-entry mark {
+      background: rgba(160,120,40,.3);
+      color: var(--gold-lt);
+      border-radius: 2px;
+      padding: 0 2px;
+      font-weight: 700;
+    }
     .conc-empty { padding: 1rem; color: var(--muted); font-size: .85rem; font-style: italic; }
     .conc-loading { padding: 1rem; color: var(--muted); font-size: .85rem; }
     .conc-count-badge {
       display: inline-block;
-      background: rgba(255,255,255,.3);
-      border-radius: 10px;
+      background: rgba(0,0,0,.25);
+      border-radius: 2px;
       padding: .05rem .5rem;
-      font-size: .75rem;
+      font-size: .72rem;
     }
 
     /* ─── WORD CLOUD ─── */
     #word-cloud-svg text { cursor: default; transition: opacity .2s; }
-    #word-cloud-svg text:hover { opacity: .7; }
+    #word-cloud-svg text:hover { opacity: .6; }
 
     /* ─── CALLOUT BOX ─── */
     .callout {
-      background: #f0f4fa;
-      border-left: 4px solid var(--hca);
+      background: #1a1208;
+      border-left: 3px solid var(--gold);
       border-radius: 0 var(--radius) var(--radius) 0;
       padding: .9rem 1.2rem;
       font-size: .85rem;
-      line-height: 1.6;
+      line-height: 1.65;
       margin-bottom: 1.5rem;
     }
-    .callout strong { color: #1a1a2e; }
+    .callout strong { color: var(--gold-lt); }
 
     /* ─── INSIGHT CHIPS ─── */
     .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem; margin-bottom: 1.5rem; }
@@ -429,9 +534,18 @@
       border-radius: var(--radius);
       padding: .9rem 1.1rem;
       font-size: .82rem;
-      line-height: 1.55;
+      line-height: 1.6;
+      box-shadow: 0 2px 10px rgba(0,0,0,.3);
     }
-    .insight-chip strong { display: block; font-size: .88rem; margin-bottom: .25rem; }
+    .insight-chip strong {
+      display: block;
+      font-family: 'Cinzel', serif;
+      font-size: .72rem;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: .35rem;
+    }
 
     /* ─── LOADING ─── */
     #loading {
@@ -442,27 +556,36 @@
       align-items: center;
       justify-content: center;
       z-index: 9999;
+      gap: 1.5rem;
     }
     .loader-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-      color: #1a1a2e;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.2rem;
+      color: var(--gold-lt);
+      text-align: center;
+      letter-spacing: .05em;
+    }
+    .loader-sub {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: .9rem;
+      color: var(--muted);
+      margin-top: -.75rem;
     }
     .spinner {
-      width: 40px; height: 40px;
-      border: 4px solid #e0ddd6;
-      border-top-color: #1a1a2e;
+      width: 36px; height: 36px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin .8s linear infinite;
+      animation: spin .9s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 600px) {
-      header { padding: 2rem 1rem 1.5rem; }
+      header { padding: 2.5rem 1rem 2rem; }
       main { padding: 1.25rem 1rem; }
-      .tab-btn { padding: .75rem 1rem; font-size: .8rem; }
+      .tab-btn { padding: .75rem .9rem; font-size: .65rem; }
       .theme-selector { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
     }
   </style>
@@ -470,13 +593,16 @@
 <body>
 
 <div id="loading">
-  <div class="loader-title">Loading Fairy Tales…</div>
+  <div class="loader-title">Fairy Tale Corpus Explorer</div>
+  <div class="loader-sub">Gathering the old stories…</div>
   <div class="spinner"></div>
 </div>
 
 <header>
+  <div class="header-ornament">✦ &nbsp; Textual Analysis &nbsp; ✦</div>
   <h1>Fairy Tale Corpus Explorer</h1>
-  <p>A comparative text analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures and authors.</p>
+  <div class="header-rule"><span class="header-rule-gem">❧</span></div>
+  <p>A comparative analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures and authors.</p>
   <div class="corpus-badges">
     <span class="badge badge-hca">Hans Christian Andersen</span>
     <span class="badge badge-grimms">Grimm's Fairy Tales</span>
@@ -832,7 +958,7 @@ function buildOverview() {
       responsive: true, maintainAspectRatio: true,
       plugins: { legend: { position: 'top' } },
       scales: {
-        y: { grid: { color: '#f0ede5' }, ticks: { callback: v => v.toLocaleString() } },
+        y: { grid: { color: '#2e2519' }, ticks: { callback: v => v.toLocaleString() } },
         x: { grid: { display: false } }
       }
     }
@@ -858,7 +984,7 @@ function buildOverview() {
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 45 } },
         y: {
-          grid: { color: '#f0ede5' },
+          grid: { color: '#2e2519' },
           title: { display: true, text: 'Freq per 10k tokens' }
         }
       }
@@ -913,7 +1039,7 @@ function buildFrequencies() {
         indexAxis: 'y',
         plugins: { legend: { display: false } },
         scales: {
-          x: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Count' } },
+          x: { grid: { color: '#2e2519' }, title: { display: true, text: 'Count' } },
           y: { grid: { display: false }, ticks: { font: { size: 11 } } }
         }
       }
@@ -945,8 +1071,11 @@ function buildWordCloud(key) {
   const words = corpus.top_words.slice(0, 100);
   const maxC = words[0].count, minC = words[words.length - 1].count;
   const sizeScale = d3.scaleLinear().domain([minC, maxC]).range([11, 50]);
-  const colorInterp = key === 'hca' ? d3.interpolateBlues :
-                      key === 'grimms' ? d3.interpolateOranges : d3.interpolateReds;
+  const colorInterp = key === 'hca'
+    ? t => d3.interpolate('#1e3a50', '#a8dcf8')(t)
+    : key === 'grimms'
+    ? t => d3.interpolate('#3a1e04', '#f0b04a')(t)
+    : t => d3.interpolate('#3a0808', '#f08080')(t);
 
   const placed = [];
   const rng = (a, b) => Math.random() * (b - a) + a;
@@ -1005,7 +1134,7 @@ function buildComparison() {
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 30 } },
         y: {
-          grid: { color: '#f0ede5' },
+          grid: { color: '#2e2519' },
           title: { display: true, text: 'Freq per 10k tokens' }
         }
       }
@@ -1119,7 +1248,7 @@ function buildThemes() {
       plugins: { legend: { position: 'top' } },
       scales: {
         x: {
-          grid: { color: '#f0ede5' },
+          grid: { color: '#2e2519' },
           title: { display: true, text: 'Summed freq per 10k tokens' }
         },
         y: { grid: { display: false }, ticks: { font: { size: 12 } } }
@@ -1245,7 +1374,7 @@ function showDivergence(key) {
       scales: {
         x: { grid: { display: false }, ticks: { maxRotation: 35 } },
         y: {
-          grid: { color: '#f0ede5' },
+          grid: { color: '#2e2519' },
           title: { display: true, text: 'Log-Odds vs. Other Corpora' }
         }
       }
@@ -1275,21 +1404,21 @@ function buildScatterPlot() {
   // Gridlines
   g.append('g').call(d3.axisBottom(xScale).ticks(6).tickSize(h).tickFormat(''))
     .attr('transform', 'translate(0,0)')
-    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
+    .selectAll('line').style('stroke', '#2e2519').style('stroke-dasharray', '3,3');
   g.append('g').call(d3.axisLeft(yScale).ticks(6).tickSize(-w).tickFormat(''))
-    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
+    .selectAll('line').style('stroke', '#2e2519').style('stroke-dasharray', '3,3');
 
   // Axes
   g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(6))
-    .selectAll('text').style('fill', '#888').style('font-size', '11px');
+    .selectAll('text').style('fill', '#7a6a52').style('font-size', '11px');
   g.append('g').call(d3.axisLeft(yScale).ticks(6))
-    .selectAll('text').style('fill', '#888').style('font-size', '11px');
+    .selectAll('text').style('fill', '#7a6a52').style('font-size', '11px');
 
   // Zero lines
   g.append('line').attr('x1', xScale(0)).attr('x2', xScale(0)).attr('y1', 0).attr('y2', h)
-    .style('stroke', '#bbb').style('stroke-width', 1).style('stroke-dasharray', '4,3');
+    .style('stroke', '#3e3020').style('stroke-width', 1).style('stroke-dasharray', '4,3');
   g.append('line').attr('x1', 0).attr('x2', w).attr('y1', yScale(0)).attr('y2', yScale(0))
-    .style('stroke', '#bbb').style('stroke-width', 1).style('stroke-dasharray', '4,3');
+    .style('stroke', '#3e3020').style('stroke-width', 1).style('stroke-dasharray', '4,3');
 
   // Quadrant hints
   [
@@ -1299,7 +1428,7 @@ function buildScatterPlot() {
   ].forEach(([x, y, anchor, txt]) => {
     if (!txt) return;
     g.append('text').attr('x', x).attr('y', y).attr('text-anchor', anchor)
-      .text(txt).style('fill', '#bbb').style('font-size', '10px');
+      .text(txt).style('fill', '#5a4a32').style('font-size', '10px');
   });
 
   // Dots
@@ -1347,18 +1476,18 @@ function buildScatterPlot() {
         .attr('y', yScale(ys[i]) + 4)
         .text(d.word)
         .style('font-size', '10px')
-        .style('fill', '#555');
+        .style('fill', '#a09070');
     }
   });
 
   // Axis labels
   svg.append('text')
     .attr('x', totalW / 2).attr('y', h + margin.top + margin.bottom - 6)
-    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
+    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#7a6a52')
     .text('HCA vs Grimms (log-odds difference → more Grimms | more HCA →)');
   svg.append('text')
     .attr('transform', `translate(14,${(h + margin.top + margin.bottom) / 2}) rotate(-90)`)
-    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
+    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#7a6a52')
     .text('HCA vs Russian (↑ more HCA | ↓ more Russian)');
 }
 
@@ -1487,6 +1616,12 @@ function renderConcordanceResults(query, entries) {
 }
 
 // ─────────────────────────────── INIT ───────────────────────────────────────
+// Chart.js global dark theme
+Chart.defaults.color          = '#7a6a52';
+Chart.defaults.borderColor    = '#2e2519';
+Chart.defaults.font.family    = 'Inter, sans-serif';
+Chart.defaults.plugins.legend.labels.color = '#e0cfb8';
+
 loadData().then(() => {
   document.getElementById('loading').style.display = 'none';
   buildOverview();
