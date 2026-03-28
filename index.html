@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fairy Tale Corpus Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7.8.5/dist/d3.min.js"></script>
+  <style>
+    :root {
+      --hca:     #4e79a7;
+      --grimms:  #f28e2b;
+      --russian: #e15759;
+      --bg:      #faf9f6;
+      --surface: #ffffff;
+      --border:  #e8e4dc;
+      --text:    #2c2c2c;
+      --muted:   #6b6b6b;
+      --radius:  10px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff;
+      padding: 3rem 2rem 2.5rem;
+      text-align: center;
+    }
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      letter-spacing: -0.02em;
+      margin-bottom: .5rem;
+    }
+    header p {
+      opacity: .75;
+      font-size: .95rem;
+      max-width: 600px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+    .corpus-badges {
+      display: flex;
+      justify-content: center;
+      gap: .75rem;
+      margin-top: 1.25rem;
+      flex-wrap: wrap;
+    }
+    .badge {
+      padding: .35rem .9rem;
+      border-radius: 20px;
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .03em;
+    }
+    .badge-hca     { background: var(--hca);     color: #fff; }
+    .badge-grimms  { background: var(--grimms);  color: #fff; }
+    .badge-russian { background: var(--russian); color: #fff; }
+
+    /* ─── NAV TABS ─── */
+    nav.tabs {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 0;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav.tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      flex-shrink: 0;
+      padding: .85rem 1.4rem;
+      border: none;
+      background: none;
+      font-size: .85rem;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active {
+      color: #1a1a2e;
+      border-bottom-color: #1a1a2e;
+      font-weight: 600;
+    }
+
+    /* ─── LAYOUT ─── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      margin-bottom: .4rem;
+    }
+    .section-desc {
+      color: var(--muted);
+      font-size: .9rem;
+      margin-bottom: 1.75rem;
+      line-height: 1.6;
+    }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-weight: 600;
+      font-size: .95rem;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    /* ─── STATS ROW ─── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      border-left: 5px solid transparent;
+    }
+    .stat-card.hca     { border-left-color: var(--hca); }
+    .stat-card.grimms  { border-left-color: var(--grimms); }
+    .stat-card.russian { border-left-color: var(--russian); }
+    .stat-corpus { font-weight: 600; font-size: .95rem; margin-bottom: .75rem; }
+    .stat-row { display: flex; justify-content: space-between; margin-bottom: .3rem; }
+    .stat-label { color: var(--muted); font-size: .82rem; }
+    .stat-value { font-weight: 600; font-size: .88rem; }
+
+    /* ─── CHARTS ─── */
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .chart-wrap canvas { width: 100% !important; }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* ─── COMPARISON TABLE ─── */
+    .comparison-table-wrap {
+      overflow-x: auto;
+    }
+    table.comparison {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .85rem;
+    }
+    table.comparison th {
+      background: #f4f1eb;
+      padding: .6rem .9rem;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+    }
+    table.comparison td {
+      padding: .5rem .9rem;
+      border-bottom: 1px solid #f0ede5;
+    }
+    table.comparison tr:hover td { background: #faf9f6; }
+    .bar-cell { display: flex; align-items: center; gap: .5rem; }
+    .mini-bar {
+      height: 10px;
+      border-radius: 5px;
+      min-width: 2px;
+    }
+    .bar-hca     { background: var(--hca); }
+    .bar-grimms  { background: var(--grimms); }
+    .bar-russian { background: var(--russian); }
+
+    /* ─── DIVERGENCE ─── */
+    #divergence-chart-wrap svg { overflow: visible; }
+    .divergence-filter { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .filter-btn {
+      padding: .35rem .85rem;
+      border-radius: 20px;
+      border: 2px solid transparent;
+      font-size: .8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .filter-btn.active { color: #fff; }
+    .filter-btn.hca     { border-color: var(--hca);     background: transparent; color: var(--hca); }
+    .filter-btn.grimms  { border-color: var(--grimms);  background: transparent; color: var(--grimms); }
+    .filter-btn.russian { border-color: var(--russian); background: transparent; color: var(--russian); }
+    .filter-btn.hca.active     { background: var(--hca); }
+    .filter-btn.grimms.active  { background: var(--grimms); }
+    .filter-btn.russian.active { background: var(--russian); }
+
+    /* ─── CONCORDANCE ─── */
+    .conc-controls {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+      align-items: flex-end;
+    }
+    .conc-controls label {
+      font-size: .82rem;
+      font-weight: 600;
+      margin-bottom: .3rem;
+      display: block;
+      color: var(--muted);
+    }
+    .conc-input-wrap { flex: 1; min-width: 220px; }
+    .conc-input-wrap input {
+      width: 100%;
+      padding: .6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      font-size: .9rem;
+      font-family: inherit;
+      background: var(--surface);
+    }
+    .conc-input-wrap input:focus {
+      outline: none;
+      border-color: #1a1a2e;
+    }
+    .btn-search {
+      padding: .6rem 1.4rem;
+      background: #1a1a2e;
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .btn-search:hover { background: #0f3460; }
+
+    .suggestions { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
+    .suggestion-btn {
+      padding: .25rem .65rem;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      background: none;
+      font-size: .78rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .suggestion-btn:hover { background: #1a1a2e; color: #fff; border-color: #1a1a2e; }
+
+    .conc-results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.25rem;
+    }
+    .conc-corpus-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .conc-corpus-header {
+      padding: .6rem 1rem;
+      font-size: .82rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .conc-corpus-header.hca     { background: var(--hca); }
+    .conc-corpus-header.grimms  { background: var(--grimms); }
+    .conc-corpus-header.russian { background: var(--russian); }
+    .conc-entry {
+      padding: .65rem 1rem;
+      border-bottom: 1px solid #f0ede5;
+      font-size: .83rem;
+      line-height: 1.55;
+    }
+    .conc-entry:last-child { border-bottom: none; }
+    .conc-entry mark {
+      background: #fff3cd;
+      border-radius: 2px;
+      padding: 0 2px;
+      font-weight: 600;
+    }
+    .conc-empty {
+      padding: 1rem;
+      color: var(--muted);
+      font-size: .85rem;
+      font-style: italic;
+    }
+
+    /* ─── BUBBLE CHART ─── */
+    .bubble-tip {
+      position: absolute;
+      background: rgba(0,0,0,.85);
+      color: #fff;
+      padding: .4rem .75rem;
+      border-radius: 6px;
+      font-size: .78rem;
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity .15s;
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      header { padding: 2rem 1rem 1.5rem; }
+      main { padding: 1.25rem 1rem; }
+      .tab-btn { padding: .75rem 1rem; font-size: .8rem; }
+    }
+
+    /* ─── LOADING ─── */
+    #loading {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .loader-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #1a1a2e;
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 4px solid #e0ddd6;
+      border-top-color: #1a1a2e;
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── WORD CLOUD ─── */
+    #word-cloud-svg text { cursor: default; transition: opacity .2s; }
+    #word-cloud-svg text:hover { opacity: .7; }
+  </style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="loader-title">Loading Fairy Tales…</div>
+  <div class="spinner"></div>
+</div>
+
+<header>
+  <h1>Fairy Tale Corpus Explorer</h1>
+  <p>A comparative text analysis of three classic fairy tale collections — exploring language, themes, and motifs across cultures.</p>
+  <div class="corpus-badges">
+    <span class="badge badge-hca">Hans Christian Andersen</span>
+    <span class="badge badge-grimms">Grimm's Fairy Tales</span>
+    <span class="badge badge-russian">Russian Fairy Tales</span>
+  </div>
+</header>
+
+<nav class="tabs" role="tablist">
+  <button class="tab-btn active" data-tab="overview">Overview</button>
+  <button class="tab-btn" data-tab="frequencies">Word Frequencies</button>
+  <button class="tab-btn" data-tab="comparison">Cross-Corpus Comparison</button>
+  <button class="tab-btn" data-tab="divergence">Distinctive Words</button>
+  <button class="tab-btn" data-tab="concordance">Concordance</button>
+</nav>
+
+<main>
+
+  <!-- ═══════════════════════════════════════ OVERVIEW ══ -->
+  <section class="section active" id="tab-overview">
+    <h2 class="section-title">Corpus Overview</h2>
+    <p class="section-desc">
+      Summary statistics for each collection after removing stopwords and common function words.
+      HCA is the largest collection by a wide margin; use the per-10,000 token metrics for fair comparisons.
+    </p>
+
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <div class="card">
+      <div class="card-title">Vocabulary Size Comparison</div>
+      <div class="chart-wrap" style="max-height:320px">
+        <canvas id="overview-bar-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Top 30 Shared Terms — Normalized Frequency (per 10,000 tokens)</div>
+      <div class="chart-wrap" style="max-height:420px">
+        <canvas id="shared-bar-chart"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ FREQUENCIES ══ -->
+  <section class="section" id="tab-frequencies">
+    <h2 class="section-title">Word Frequency Distributions</h2>
+    <p class="section-desc">
+      Top 30 most frequent meaningful words in each collection. Toggle between raw counts and
+      normalized frequency (per 10,000 tokens) to compensate for the size difference between corpora.
+    </p>
+    <div style="margin-bottom:1.25rem">
+      <button class="filter-btn active" id="freq-mode-raw" onclick="setFreqMode('raw')">Raw Counts</button>
+      <button class="filter-btn" id="freq-mode-norm" style="border-color:#555;color:#555" onclick="setFreqMode('norm')">Per 10k Tokens</button>
+    </div>
+    <div class="charts-grid" id="freq-charts-grid"></div>
+
+    <div class="card" style="margin-top:1.5rem">
+      <div class="card-title">Word Cloud — Select Corpus</div>
+      <div style="display:flex;gap:.5rem;margin-bottom:1rem" id="cloud-corpus-btns">
+        <button class="filter-btn hca active" onclick="showCloud('hca')">HCA</button>
+        <button class="filter-btn grimms" onclick="showCloud('grimms')">Grimms</button>
+        <button class="filter-btn russian" onclick="showCloud('russian')">Russian</button>
+      </div>
+      <div id="word-cloud-wrap" style="width:100%;overflow:hidden">
+        <svg id="word-cloud-svg" style="width:100%;height:320px;display:block"></svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ COMPARISON ══ -->
+  <section class="section" id="tab-comparison">
+    <h2 class="section-title">Cross-Corpus Comparison</h2>
+    <p class="section-desc">
+      Words that appear meaningfully in all three collections. Bars show normalized frequency
+      (per 10,000 tokens). Sort and filter to explore patterns across cultures and authors.
+    </p>
+
+    <div class="card">
+      <div class="card-title">Top Shared Terms — Grouped Bar Chart</div>
+      <div class="chart-wrap" style="max-height:500px">
+        <canvas id="grouped-bar-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Shared Term Frequency Table</div>
+      <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap">
+        <span style="font-size:.82rem;color:var(--muted)">Sort by:</span>
+        <select id="table-sort" style="padding:.3rem .6rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:inherit">
+          <option value="avg">Average Frequency</option>
+          <option value="hca">HCA Frequency</option>
+          <option value="grimms">Grimms Frequency</option>
+          <option value="russian">Russian Frequency</option>
+          <option value="word">Alphabetical</option>
+        </select>
+        <input type="text" id="table-filter" placeholder="Filter words…"
+          style="padding:.3rem .75rem;border:1px solid var(--border);border-radius:6px;font-size:.82rem;font-family:inherit;flex:1;min-width:120px" />
+      </div>
+      <div class="comparison-table-wrap" style="max-height:500px;overflow-y:auto">
+        <table class="comparison" id="comparison-table">
+          <thead>
+            <tr>
+              <th>Word</th>
+              <th style="color:var(--hca)">HCA</th>
+              <th style="color:var(--grimms)">Grimms</th>
+              <th style="color:var(--russian)">Russian</th>
+            </tr>
+          </thead>
+          <tbody id="comparison-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ DIVERGENCE ══ -->
+  <section class="section" id="tab-divergence">
+    <h2 class="section-title">Distinctive Words</h2>
+    <p class="section-desc">
+      Words that appear disproportionately in one collection relative to the others, revealing
+      thematic and stylistic distinctiveness. Computed using log-odds ratio against the combined
+      frequency of the other two corpora.
+    </p>
+    <div class="divergence-filter">
+      <button class="filter-btn hca active" onclick="showDivergence('hca')">HCA Distinctive</button>
+      <button class="filter-btn grimms" onclick="showDivergence('grimms')">Grimms Distinctive</button>
+      <button class="filter-btn russian" onclick="showDivergence('russian')">Russian Distinctive</button>
+    </div>
+    <div class="card" id="divergence-card">
+      <div class="card-title" id="divergence-title">Words Distinctive to HCA</div>
+      <div class="chart-wrap" style="max-height:450px">
+        <canvas id="divergence-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Log-Odds Scatter: All Three Corpora</div>
+      <p style="font-size:.82rem;color:var(--muted);margin-bottom:1rem">
+        Each dot is a word. Position on X-axis shows relative prevalence in HCA vs Grimms;
+        Y-axis shows HCA vs Russian. Words in the center are shared; outliers are distinctive.
+      </p>
+      <div id="scatter-wrap" style="width:100%;position:relative">
+        <svg id="scatter-svg" style="width:100%;display:block"></svg>
+        <div class="bubble-tip" id="scatter-tip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ CONCORDANCE ══ -->
+  <section class="section" id="tab-concordance">
+    <h2 class="section-title">Concordance Search</h2>
+    <p class="section-desc">
+      Search for any word and see it in context across all three collections. Pre-computed
+      concordances are available for the top 40 shared terms; other words will search the
+      frequency data.
+    </p>
+    <div class="conc-controls">
+      <div class="conc-input-wrap">
+        <label for="conc-search-input">Search word</label>
+        <input type="text" id="conc-search-input" placeholder="e.g. king, water, forest…" autocomplete="off" />
+      </div>
+      <button class="btn-search" onclick="searchConcordance()">Search</button>
+    </div>
+    <div>
+      <span style="font-size:.82rem;color:var(--muted);margin-right:.5rem">Try:</span>
+      <div class="suggestions" id="concordance-suggestions"></div>
+    </div>
+    <div class="conc-results-grid" id="conc-results"></div>
+  </section>
+
+</main>
+
+<script>
+// ─────────────────────────────── DATA LOADING ───────────────────────────────
+let CORPORA = null, SHARED = null, CONCORDANCE = null, FREQ_TABLE = null;
+
+const COLORS = { hca: '#4e79a7', grimms: '#f28e2b', russian: '#e15759' };
+const LABELS = { hca: 'HCA', grimms: 'Grimms', russian: 'Russian' };
+const FULL_LABELS = {
+  hca: 'Hans Christian Andersen',
+  grimms: "Grimm's Fairy Tales",
+  russian: 'Russian Fairy Tales'
+};
+
+async function loadData() {
+  [CORPORA, SHARED, CONCORDANCE, FREQ_TABLE] = await Promise.all([
+    fetch('data/corpora.json').then(r => r.json()),
+    fetch('data/shared.json').then(r => r.json()),
+    fetch('data/concordance.json').then(r => r.json()),
+    fetch('data/freq_table.json').then(r => r.json()),
+  ]);
+}
+
+// ─────────────────────────────── TABS ───────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ─────────────────────────────── OVERVIEW ───────────────────────────────────
+function buildOverview() {
+  const grid = document.getElementById('stats-grid');
+  CORPORA.forEach(c => {
+    const topWords = c.top_words.slice(0, 5).map(w => w.word).join(', ');
+    grid.innerHTML += `
+      <div class="stat-card ${c.key}">
+        <div class="stat-corpus" style="color:${c.color}">${c.label}</div>
+        <div class="stat-row"><span class="stat-label">Total tokens (content words)</span><span class="stat-value">${c.total_tokens.toLocaleString()}</span></div>
+        <div class="stat-row"><span class="stat-label">Unique vocabulary</span><span class="stat-value">${c.unique_tokens.toLocaleString()}</span></div>
+        <div class="stat-row"><span class="stat-label">Lexical richness</span><span class="stat-value">${(c.unique_tokens / c.total_tokens * 100).toFixed(1)}%</span></div>
+        <div class="stat-row"><span class="stat-label">Top 5 words</span><span class="stat-value" style="font-size:.78rem">${topWords}</span></div>
+      </div>`;
+  });
+
+  // Vocab comparison chart
+  new Chart(document.getElementById('overview-bar-chart'), {
+    type: 'bar',
+    data: {
+      labels: CORPORA.map(c => c.label),
+      datasets: [
+        {
+          label: 'Total Tokens',
+          data: CORPORA.map(c => c.total_tokens),
+          backgroundColor: CORPORA.map(c => c.color + 'cc'),
+          borderColor: CORPORA.map(c => c.color),
+          borderWidth: 2,
+        },
+        {
+          label: 'Unique Words',
+          data: CORPORA.map(c => c.unique_tokens),
+          backgroundColor: CORPORA.map(c => c.color + '55'),
+          borderColor: CORPORA.map(c => c.color),
+          borderWidth: 2,
+          borderDash: [4, 3],
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        y: { grid: { color: '#f0ede5' }, ticks: { callback: v => v.toLocaleString() } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Shared terms bar
+  const top30 = SHARED.slice(0, 30);
+  new Chart(document.getElementById('shared-bar-chart'), {
+    type: 'bar',
+    data: {
+      labels: top30.map(s => s.word),
+      datasets: CORPORA.map(c => ({
+        label: c.label,
+        data: top30.map(s => s.normalized[c.key]),
+        backgroundColor: c.color + 'cc',
+        borderColor: c.color,
+        borderWidth: 1,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 45 } },
+        y: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Freq per 10k tokens' } }
+      }
+    }
+  });
+}
+
+// ─────────────────────────────── FREQUENCIES ────────────────────────────────
+let freqCharts = {};
+let freqMode = 'raw';
+
+function setFreqMode(mode) {
+  freqMode = mode;
+  document.getElementById('freq-mode-raw').classList.toggle('active', mode === 'raw');
+  document.getElementById('freq-mode-norm').classList.toggle('active', mode === 'norm');
+  CORPORA.forEach(c => updateFreqChart(c));
+}
+
+function updateFreqChart(c) {
+  const chart = freqCharts[c.key];
+  if (!chart) return;
+  const top30 = c.top_words.slice(0, 30);
+  chart.data.datasets[0].data = top30.map(w => freqMode === 'raw' ? w.count : w.freq);
+  chart.options.scales.y.title.text = freqMode === 'raw' ? 'Count' : 'Per 10k tokens';
+  chart.update();
+}
+
+function buildFrequencies() {
+  const grid = document.getElementById('freq-charts-grid');
+  CORPORA.forEach(c => {
+    const wrap = document.createElement('div');
+    wrap.className = 'card';
+    wrap.innerHTML = `
+      <div class="card-title" style="color:${c.color}">${c.label}</div>
+      <div class="chart-wrap"><canvas id="freq-chart-${c.key}"></canvas></div>`;
+    grid.appendChild(wrap);
+
+    const top30 = c.top_words.slice(0, 30);
+    freqCharts[c.key] = new Chart(document.getElementById('freq-chart-' + c.key), {
+      type: 'bar',
+      data: {
+        labels: top30.map(w => w.word),
+        datasets: [{
+          label: c.label,
+          data: top30.map(w => w.count),
+          backgroundColor: c.color + 'cc',
+          borderColor: c.color,
+          borderWidth: 1,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: true,
+        indexAxis: 'y',
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Count' } },
+          y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    });
+  });
+
+  buildWordCloud('hca');
+}
+
+// ─────────────────────────────── WORD CLOUD ─────────────────────────────────
+let activeCloud = 'hca';
+function showCloud(key) {
+  activeCloud = key;
+  document.querySelectorAll('#cloud-corpus-btns .filter-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase() === key ||
+      (key === 'grimms' && b.textContent === 'Grimms') ||
+      (key === 'hca' && b.textContent === 'HCA') ||
+      (key === 'russian' && b.textContent === 'Russian')
+    );
+  });
+  buildWordCloud(key);
+}
+
+function buildWordCloud(key) {
+  const corpus = CORPORA.find(c => c.key === key);
+  const svg = document.getElementById('word-cloud-svg');
+  const w = svg.clientWidth || 600;
+  const h = 320;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  svg.innerHTML = '';
+
+  const words = corpus.top_words.slice(0, 80);
+  const maxCount = words[0].count;
+  const minCount = words[words.length - 1].count;
+
+  const scale = d3.scaleLinear().domain([minCount, maxCount]).range([11, 46]);
+  const color = d3.scaleSequential(d3.interpolateBlues).domain([minCount, maxCount]);
+
+  // Simple random placement with collision avoidance
+  const placed = [];
+  const rng = (min, max) => Math.random() * (max - min) + min;
+
+  words.forEach(w_item => {
+    const fontSize = scale(w_item.count);
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.textContent = w_item.word;
+    text.setAttribute('font-size', fontSize);
+    text.setAttribute('font-family', 'Inter, sans-serif');
+    text.setAttribute('fill', key === 'hca' ? d3.interpolateBlues(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)) :
+                              key === 'grimms' ? d3.interpolateOranges(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)) :
+                              d3.interpolateReds(0.3 + 0.7 * (w_item.count - minCount) / (maxCount - minCount)));
+
+    const approxW = w_item.word.length * fontSize * 0.58;
+    const approxH = fontSize;
+
+    let attempts = 0;
+    let x, y, fits;
+    do {
+      x = rng(approxW / 2, w - approxW / 2);
+      y = rng(approxH, h - 8);
+      fits = placed.every(p => {
+        return !(Math.abs(x - p.x) < (approxW + p.w) / 2 + 4 &&
+                 Math.abs(y - p.y) < (approxH + p.h) / 2 + 4);
+      });
+      attempts++;
+    } while (!fits && attempts < 120);
+
+    if (fits || attempts >= 120) {
+      text.setAttribute('x', x);
+      text.setAttribute('y', y);
+      text.setAttribute('text-anchor', 'middle');
+      svg.appendChild(text);
+      placed.push({ x, y, w: approxW, h: approxH });
+    }
+  });
+}
+
+// ─────────────────────────────── COMPARISON ─────────────────────────────────
+let groupedChart = null;
+
+function buildComparison() {
+  const top20 = SHARED.slice(0, 20);
+  groupedChart = new Chart(document.getElementById('grouped-bar-chart'), {
+    type: 'bar',
+    data: {
+      labels: top20.map(s => s.word),
+      datasets: CORPORA.map(c => ({
+        label: c.label,
+        data: top20.map(s => s.normalized[c.key]),
+        backgroundColor: c.color + 'cc',
+        borderColor: c.color,
+        borderWidth: 1,
+      }))
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { position: 'top' } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 30 } },
+        y: { grid: { color: '#f0ede5' }, title: { display: true, text: 'Freq per 10k tokens' } }
+      }
+    }
+  });
+
+  renderComparisonTable(SHARED);
+
+  document.getElementById('table-sort').addEventListener('change', () => {
+    filterAndSortTable();
+  });
+  document.getElementById('table-filter').addEventListener('input', () => {
+    filterAndSortTable();
+  });
+}
+
+function filterAndSortTable() {
+  const sort = document.getElementById('table-sort').value;
+  const filter = document.getElementById('table-filter').value.toLowerCase().trim();
+  let data = [...SHARED];
+  if (filter) data = data.filter(d => d.word.includes(filter));
+  if (sort === 'avg') data.sort((a, b) => b.avg_norm - a.avg_norm);
+  else if (sort === 'word') data.sort((a, b) => a.word.localeCompare(b.word));
+  else data.sort((a, b) => b.normalized[sort] - a.normalized[sort]);
+  renderComparisonTable(data);
+}
+
+function renderComparisonTable(data) {
+  const maxNorm = Math.max(...SHARED.map(s => Math.max(...CORPORA.map(c => s.normalized[c.key]))));
+  const tbody = document.getElementById('comparison-tbody');
+  tbody.innerHTML = data.map(row => {
+    const cells = CORPORA.map(c => {
+      const val = row.normalized[c.key];
+      const barW = Math.round(val / maxNorm * 120);
+      return `<td><div class="bar-cell">
+        <div class="mini-bar bar-${c.key}" style="width:${barW}px"></div>
+        <span style="font-size:.8rem;color:var(--muted)">${val.toFixed(1)}</span>
+      </div></td>`;
+    }).join('');
+    return `<tr><td><strong>${row.word}</strong></td>${cells}</tr>`;
+  }).join('');
+}
+
+// ─────────────────────────────── DIVERGENCE ─────────────────────────────────
+let divergenceChart = null;
+let activeDivCorpus = 'hca';
+
+function computeLogOdds() {
+  // For each word in SHARED, compute log-odds for each corpus vs. combined others
+  return SHARED.map(item => {
+    const result = { word: item.word };
+    CORPORA.forEach(c => {
+      const self = item.normalized[c.key] + 0.5;
+      const others = CORPORA.filter(o => o.key !== c.key)
+        .map(o => item.normalized[o.key]).reduce((a, b) => a + b, 0) / 2 + 0.5;
+      result['logodds_' + c.key] = Math.log(self / others);
+    });
+    return result;
+  });
+}
+
+function showDivergence(key) {
+  activeDivCorpus = key;
+  document.querySelectorAll('.divergence-filter .filter-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.textContent.toLowerCase().startsWith(LABELS[key].toLowerCase())) b.classList.add('active');
+  });
+
+  const logOdds = computeLogOdds();
+  logOdds.sort((a, b) => b['logodds_' + key] - a['logodds_' + key]);
+  const top20 = logOdds.slice(0, 20);
+
+  const corpus = CORPORA.find(c => c.key === key);
+  document.getElementById('divergence-title').textContent = `Words Distinctive to ${corpus.label}`;
+
+  if (divergenceChart) divergenceChart.destroy();
+  divergenceChart = new Chart(document.getElementById('divergence-chart'), {
+    type: 'bar',
+    data: {
+      labels: top20.map(d => d.word),
+      datasets: [{
+        label: 'Log-Odds Ratio',
+        data: top20.map(d => +d['logodds_' + key].toFixed(3)),
+        backgroundColor: corpus.color + 'cc',
+        borderColor: corpus.color,
+        borderWidth: 1,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxRotation: 30 } },
+        y: {
+          grid: { color: '#f0ede5' },
+          title: { display: true, text: 'Log-Odds vs. Other Corpora' }
+        }
+      }
+    }
+  });
+}
+
+function buildScatterPlot() {
+  const logOdds = computeLogOdds();
+  const svg = d3.select('#scatter-svg');
+  const container = document.getElementById('scatter-wrap');
+  const totalW = container.clientWidth || 600;
+  const margin = { top: 20, right: 20, bottom: 50, left: 55 };
+  const w = totalW - margin.left - margin.right;
+  const h = Math.min(w * 0.65, 420);
+  svg.attr('height', h + margin.top + margin.bottom)
+     .attr('viewBox', `0 0 ${totalW} ${h + margin.top + margin.bottom}`);
+
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const xs = logOdds.map(d => d.logodds_hca - d.logodds_grimms);
+  const ys = logOdds.map(d => d.logodds_hca - d.logodds_russian);
+  const xExt = d3.extent(xs);
+  const yExt = d3.extent(ys);
+
+  const xScale = d3.scaleLinear().domain(xExt).nice().range([0, w]);
+  const yScale = d3.scaleLinear().domain(yExt).nice().range([h, 0]);
+
+  // Axes
+  g.append('g').attr('transform', `translate(0,${h})`).call(d3.axisBottom(xScale).ticks(6))
+    .selectAll('text').style('fill', '#888').style('font-size', '11px');
+  g.append('g').call(d3.axisLeft(yScale).ticks(6))
+    .selectAll('text').style('fill', '#888').style('font-size', '11px');
+
+  // Gridlines
+  g.append('g').attr('class', 'grid')
+    .call(d3.axisBottom(xScale).ticks(6).tickSize(h).tickFormat(''))
+    .attr('transform', 'translate(0,0)')
+    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
+  g.append('g').attr('class', 'grid')
+    .call(d3.axisLeft(yScale).ticks(6).tickSize(-w).tickFormat(''))
+    .selectAll('line').style('stroke', '#f0ede5').style('stroke-dasharray', '3,3');
+
+  // Zero lines
+  g.append('line').attr('x1', xScale(0)).attr('x2', xScale(0)).attr('y1', 0).attr('y2', h)
+    .style('stroke', '#ccc').style('stroke-width', 1);
+  g.append('line').attr('x1', 0).attr('x2', w).attr('y1', yScale(0)).attr('y2', yScale(0))
+    .style('stroke', '#ccc').style('stroke-width', 1);
+
+  // Quadrant labels
+  const qStyle = { fill: '#bbb', 'font-size': '10px', 'font-style': 'italic' };
+  g.append('text').attr('x', w - 4).attr('y', 14).attr('text-anchor', 'end').text('← HCA distinctive →').style('fill', '#bbb').style('font-size', '10px');
+  g.append('text').attr('x', 4).attr('y', 14).text('← Grimms').style('fill', '#bbb').style('font-size', '10px');
+
+  // Dots
+  const tip = document.getElementById('scatter-tip');
+  g.selectAll('circle').data(logOdds).enter().append('circle')
+    .attr('cx', (d, i) => xScale(xs[i]))
+    .attr('cy', (d, i) => yScale(ys[i]))
+    .attr('r', 5)
+    .attr('fill', d => {
+      // Color by most distinctive corpus
+      const hca_v = d.logodds_hca;
+      const gr_v = d.logodds_grimms;
+      const ru_v = d.logodds_russian;
+      if (hca_v > gr_v && hca_v > ru_v) return COLORS.hca + 'cc';
+      if (gr_v > hca_v && gr_v > ru_v) return COLORS.grimms + 'cc';
+      return COLORS.russian + 'cc';
+    })
+    .attr('stroke', '#fff')
+    .attr('stroke-width', 1)
+    .style('cursor', 'default')
+    .on('mouseover', function(event, d) {
+      const i = logOdds.indexOf(d);
+      d3.select(this).attr('r', 8);
+      tip.style.opacity = '1';
+      tip.style.left = (event.offsetX + 12) + 'px';
+      tip.style.top = (event.offsetY - 28) + 'px';
+      tip.textContent = `"${d.word}" — HCA↔Grimms: ${xs[i].toFixed(2)}, HCA↔Russian: ${ys[i].toFixed(2)}`;
+    })
+    .on('mouseout', function() {
+      d3.select(this).attr('r', 5);
+      tip.style.opacity = '0';
+    });
+
+  // Labels for outlier words
+  const allR = logOdds.map((d, i) => Math.sqrt(xs[i] ** 2 + ys[i] ** 2));
+  const threshold = d3.quantile(allR.sort(d3.ascending), 0.8);
+  logOdds.forEach((d, i) => {
+    if (allR[i] >= threshold) {
+      g.append('text')
+        .attr('x', xScale(xs[i]) + 7)
+        .attr('y', yScale(ys[i]) + 4)
+        .text(d.word)
+        .style('font-size', '10px')
+        .style('fill', '#555');
+    }
+  });
+
+  // Axis labels
+  svg.append('text')
+    .attr('x', totalW / 2).attr('y', h + margin.top + margin.bottom - 4)
+    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
+    .text('HCA vs Grimms (log-odds difference)');
+  svg.append('text')
+    .attr('transform', `translate(14,${(h + margin.top + margin.bottom) / 2}) rotate(-90)`)
+    .attr('text-anchor', 'middle').style('font-size', '11px').style('fill', '#888')
+    .text('HCA vs Russian (log-odds difference)');
+}
+
+// ─────────────────────────────── CONCORDANCE ────────────────────────────────
+function buildConcordance() {
+  const suggestions = Object.keys(CONCORDANCE).slice(0, 20);
+  const container = document.getElementById('concordance-suggestions');
+  suggestions.forEach(w => {
+    const btn = document.createElement('button');
+    btn.className = 'suggestion-btn';
+    btn.textContent = w;
+    btn.onclick = () => {
+      document.getElementById('conc-search-input').value = w;
+      searchConcordance();
+    };
+    container.appendChild(btn);
+  });
+
+  document.getElementById('conc-search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') searchConcordance();
+  });
+
+  // Default search
+  document.getElementById('conc-search-input').value = 'king';
+  searchConcordance();
+}
+
+function searchConcordance() {
+  const query = document.getElementById('conc-search-input').value.trim().toLowerCase();
+  if (!query) return;
+
+  const results = document.getElementById('conc-results');
+  results.innerHTML = '';
+
+  const entries = CONCORDANCE[query];
+
+  CORPORA.forEach(c => {
+    const panel = document.createElement('div');
+    panel.className = 'conc-corpus-panel';
+
+    const corpusEntries = entries ? entries[c.key] : [];
+    const count = corpusEntries ? corpusEntries.length : 0;
+
+    panel.innerHTML = `
+      <div class="conc-corpus-header ${c.key}">
+        <span>${c.label}</span>
+        <span>${count} match${count !== 1 ? 'es' : ''}</span>
+      </div>`;
+
+    if (!corpusEntries || corpusEntries.length === 0) {
+      panel.innerHTML += `<div class="conc-empty">No concordance data available for "${query}" in this corpus.</div>`;
+    } else {
+      corpusEntries.forEach(entry => {
+        const div = document.createElement('div');
+        div.className = 'conc-entry';
+        div.innerHTML = entry.highlighted || entry.text;
+        panel.appendChild(div);
+      });
+    }
+
+    results.appendChild(panel);
+  });
+
+  if (!entries) {
+    results.innerHTML = `<div class="card" style="grid-column:1/-1">
+      <p style="color:var(--muted);font-size:.88rem">
+        No pre-computed concordance for "<strong>${query}</strong>".
+        Pre-computed data is available for: ${Object.keys(CONCORDANCE).join(', ')}.
+      </p>
+    </div>`;
+  }
+}
+
+// ─────────────────────────────── INIT ───────────────────────────────────────
+loadData().then(() => {
+  document.getElementById('loading').style.display = 'none';
+  buildOverview();
+  buildFrequencies();
+  buildComparison();
+  showDivergence('hca');
+  buildScatterPlot();
+  buildConcordance();
+}).catch(err => {
+  document.getElementById('loading').innerHTML =
+    `<div style="color:red;padding:2rem;text-align:center">
+      <strong>Error loading data:</strong><br>${err.message}
+    </div>`;
+  console.error(err);
+});
+</script>
+</body>
+</html>
